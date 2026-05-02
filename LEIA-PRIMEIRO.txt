@@ -1,0 +1,94 @@
+═══════════════════════════════════════════════════════════════
+  VetroLine — LEIA PRIMEIRO!
+═══════════════════════════════════════════════════════════════
+
+Oi Eliab! 👋
+
+Esse é o teu sistema VetroLine completo, pronto pra rodar.
+
+PASSO 1 — ABRIR NO VS CODE
+──────────────────────────
+1. Extrai esse zip numa pasta (ex: C:\Projetos\vetroline)
+2. Abre o VS Code
+3. Vai em "File" → "Open Folder"
+4. Escolhe a pasta vetroline
+
+
+PASSO 2 — CRIAR O BANCO DE DADOS (5 minutos)
+─────────────────────────────────────────────
+1. Abre supabase.com no navegador, faz login
+2. Entra no teu projeto VetroLine
+3. No menu da esquerda, clica em "SQL Editor"
+4. Clica em "New query"
+5. No VS Code, abre o arquivo: database/schema.sql
+6. Copia TUDO (Ctrl+A → Ctrl+C)
+7. Cola no SQL Editor do Supabase (Ctrl+V)
+8. Clica em "Run" (botão verde no canto)
+
+⚠️ ATENÇÃO: se tu já tinha rodado o SQL antes, esse vai
+APAGAR e recriar tudo. Vai precisar refazer o passo 3.
+
+
+PASSO 3 — LINKAR TEU EMAIL À VIDRAÇARIA DEMO
+─────────────────────────────────────────────
+No SQL Editor do Supabase, roda esse comando
+(troca o EMAIL pelo teu se for diferente):
+
+  insert into public.profiles (id, organization_id, name, role, phone)
+  select id, '00000000-0000-0000-0000-000000000001'::uuid, 'Marcos', 'admin', '(49) 99999-0000'
+  from auth.users where email = 'eliabyzaid@gmail.com';
+
+Clica em Run. Pronto!
+
+
+PASSO 4 — RODAR O SISTEMA
+─────────────────────────
+1. No VS Code, instala a extensão "Live Server"
+   (procura por "Live Server" do "Ritwick Dey")
+2. Clica com BOTÃO DIREITO no arquivo "index.html"
+3. Escolhe "Open with Live Server"
+4. Vai abrir o sistema no navegador
+
+LOGA com:
+  - Email: eliabyzaid@gmail.com
+  - Senha: a que tu cadastrou no Supabase
+
+
+O QUE TU PODE FAZER NO SISTEMA
+──────────────────────────────
+✅ Dashboard com estatísticas reais
+✅ Cadastrar clientes
+✅ Criar ordens de serviço (OS)
+✅ Fazer orçamentos com geração de PDF
+✅ Controlar estoque (alumínio, vidros)
+✅ Cadastro de produtos
+✅ Financeiro (entradas e saídas)
+✅ Ver funcionários
+✅ Multi-tenant (vários clientes podem usar)
+
+
+SE ALGO DER ERRADO
+──────────────────
+1. Abre o console do navegador (tecla F12)
+2. Clica na aba "Console"
+3. Tira print do erro vermelho
+4. Vem aqui no Claude e me manda o print
+
+Eu te ajudo a arrumar na hora.
+
+
+PRA EDITAR DEPOIS
+─────────────────
+- Cores: edita css/style.css (lá em :root tem as cores)
+- Tela específica: edita js/modules/[nome].js
+- Adicionar campo: avisa o Claude que ele te ensina
+
+
+LEIA TAMBÉM
+───────────
+- README.md         → visão geral
+- docs/COMO-USAR.md → manual passo a passo
+- docs/DEPLOY.md    → como publicar online (Netlify)
+- docs/ROADMAP.md   → próximas funcionalidades
+
+Bom trabalho! 🚀

@@ -1,0 +1,116 @@
+═══════════════════════════════════════════════════════════════
+  VetroLine — ATUALIZAÇÃO Sprint 3 (MEGA UPDATE)
+═══════════════════════════════════════════════════════════════
+
+OPA ELIAB! Essa é a atualização GRANDE! 🚀
+
+NOVIDADES:
+─────────
+✅ MENU LATERAL EM GAVETA (botão ☰ no canto superior esquerdo)
+✅ AGENDA com calendário visual
+✅ TELA DE CONFIGURAÇÕES (preço alumínio, peso barra, serviços)
+✅ Funcionário pode FAZER ORÇAMENTO na casa do cliente
+✅ Sistema de CORTES de alumínio (chefe manda lista, funcionário marca)
+✅ Funcionário NÃO vê mais telefone do cliente (só endereço)
+✅ Produtos sem campo "unidade" (mais simples)
+
+
+COMO INSTALAR (3 PASSOS):
+────────────────────────
+
+PASSO 1 — RODAR SQL DE UPGRADE
+───────────────────────────────
+1. Abre Supabase → SQL Editor → New query
+2. No VS Code abre: database/upgrade-sprint3.sql
+3. Copia TUDO, cola no Supabase, RUN
+⚠️ Esse SQL não apaga teus dados! Só adiciona coisas novas.
+
+
+PASSO 2 — SUBSTITUIR A PASTA
+────────────────────────────
+1. APAGA a pasta vetroline antiga
+2. EXTRAI o zip novo (vetroline-sprint3.zip)
+3. Pasta vai chamar "vetroline-v3" — RENOMEIA pra "vetroline"
+4. Abre no VS Code
+
+
+PASSO 3 — TESTAR
+────────────────
+1. Open with Live Server no index.html
+2. Loga normalmente
+3. Vai aparecer:
+   - Botão ☰ no canto superior esquerdo (abre o menu lateral)
+   - Logo VetroLine no centro
+   - Teu nome no canto direito
+
+
+O QUE TESTAR:
+─────────────
+
+🏠 DASHBOARD: igual antes
+
+📅 AGENDA (NOVO!):
+   - Calendário do mês inteiro
+   - Dias com OS aparecem com bolinha verde
+   - Clica num dia pra ver os serviços
+   - Setinhas pra mudar mês
+
+⚙️ CONFIGURAÇÕES (NOVO!):
+   - Preencha os preços de alumínio
+   - Salva e da pra usar nos orçamentos depois
+   - É a "fonte oficial" dos teus preços
+
+📋 ORDENS - tem botão NOVO:
+   - ✂️ ao lado de cada OS = abre lista de cortes
+   - Tu adiciona os cortes que precisa fazer
+   - O funcionário vai ver e marcar quando cortou
+
+🏷️ PRODUTOS:
+   - Não tem mais "unidade" (estava confuso)
+   - Edita nome, descrição, categoria, preço, custo livremente
+
+📱 MINHAS OS (TESTE COMO FUNCIONÁRIO):
+   - Loga com funcionario1@gmail.com
+   - Abre uma OS
+   - Vê:
+     ✓ Endereço com Google Maps
+     ✗ NÃO vê telefone (correto!)
+     ✓ Botão "Tirar foto"
+     ✓ Lista de cortes (com checkbox pra marcar)
+     ✓ Botão "⚡ Fazer Orçamento Rápido" (na casa do cliente)
+
+
+COMO TESTAR ORÇAMENTO RÁPIDO (FUNCIONÁRIO):
+────────────────────────────────────────────
+1. Loga como funcionário
+2. Abre uma OS
+3. Rola até "💰 Orçamento na casa do cliente"
+4. Clica em "⚡ Fazer Orçamento Rápido"
+5. Coloca valor materiais, mão de obra, desconto
+6. O TOTAL aparece automático
+7. Clica "Enviar pro Chefe"
+8. SAI e LOGA como chefe
+9. Vai em ⚡ Orçamentos → o orçamento criado tá lá!
+
+
+COMO TESTAR CORTES:
+───────────────────
+1. Como CHEFE, vai em 📋 Ordens
+2. Clica no ✂️ ao lado de uma OS
+3. Adiciona alguns cortes (ex: Perfil Suprema, Branco, 2.50m, 3 unidades)
+4. Salva
+5. SAI e LOGA como funcionário
+6. Abre essa mesma OS
+7. Vai aparecer a lista de cortes
+8. Marca os checkboxes quando ele cortou
+
+
+SE DER ERRO:
+────────────
+- F12 → Console → print do erro vermelho
+- Manda no Claude que arrumamos
+
+⚠️ AVISO: Como tem MUITA coisa nova, pode ter algum bug 
+que eu não pensei. Avisa que eu arrumo na hora!
+
+🔥 BORA TESTAR!
