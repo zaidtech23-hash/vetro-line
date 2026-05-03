@@ -1,0 +1,60 @@
+═══════════════════════════════════════════════════════════════
+  VetroLine — ATUALIZAÇÃO Sprint 7.3 (UX MOBILE)
+═══════════════════════════════════════════════════════════════
+
+OPA ELIAB!
+
+ARRUMEI O QUE TU PEDIU:
+
+✅ Botão "✅ Terminei — Avisar Chefe" (não gigante, do tamanho certo)
+✅ Botão marca como concluído + avisa o chefe automático
+✅ Mensagem clara: "Orçamento enviado pro chefe! Ele vai revisar e te avisar"
+✅ Aviso bonito quando OS já foi concluída
+✅ TUDO RESPONSIVO PRO CELULAR (telas pequenas, médias, grandes)
+✅ Tamanho dos botões adequado pra dedo (mín 44px)
+✅ Forms se adaptam (1 coluna no celular, 2 no desktop)
+✅ Modais ocupam quase tela toda no celular
+✅ Toast com texto que NÃO quebra/corta
+✅ Funciona até em celular pequeno (320px)
+
+
+═══════════════════════════════════════════════════════════════
+PASSO ÚNICO — SUBIR NO GITHUB
+═══════════════════════════════════════════════════════════════
+
+❌ NÃO precisa rodar SQL!
+❌ NÃO precisa mexer no Supabase!
+
+✅ SÓ precisa:
+
+1. Apaga pasta vetroline antiga
+2. Extrai vetroline-sprint7-3.zip
+3. Renomeia "vetroline-v7" pra "vetroline"
+4. GitHub → Add file → Upload files → arrasta tudo
+5. Confirma "Replace existing files"
+6. Commit changes
+7. Espera 30 segundos
+
+
+═══════════════════════════════════════════════════════════════
+DEPOIS:
+═══════════════════════════════════════════════════════════════
+
+📱 NO CELULAR: LIMPA O CACHE!
+- Chrome → 3 pontinhos → Histórico → Limpar dados → marca cache → Limpar
+
+
+═══════════════════════════════════════════════════════════════
+COMO TESTAR:
+═══════════════════════════════════════════════════════════════
+
+1. Loga como FUNCIONÁRIO
+2. Vai em Minhas OS
+3. Abre uma OS qualquer
+4. Vê os botões "🏭 Em produção" e "🚚 Em campo" (lado a lado, pequenos)
+5. Vê o botão verde "✅ Terminei — Avisar Chefe" abaixo
+6. Toca nele → confirma → MAGIA! ✨
+7. Marca como concluído + avisa o chefe + mostra mensagem positiva
+8. OS fica com aviso verde "Serviço concluído! Chefe foi notificado"
+
+🔥 BORA TESTAR!

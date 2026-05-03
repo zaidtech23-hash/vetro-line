@@ -1,0 +1,95 @@
+═══════════════════════════════════════════════════════════════
+  VetroLine — ATUALIZAÇÃO Sprint 2 (parte 1)
+═══════════════════════════════════════════════════════════════
+
+OPA ELIAB! Essa é a primeira parte das melhorias! 🚀
+
+O QUE TEM DE NOVO:
+─────────────────
+✅ Sistema de PERMISSÕES (chefe vê tudo, funcionário vê só o dele)
+✅ Tela "MINHAS OS" pro funcionário
+✅ Funcionário pode atualizar STATUS da OS dele
+✅ Funcionário pode MANDAR FOTO do serviço
+✅ Funcionário NÃO vê financeiro nem clientes (só na OS dele)
+
+
+COMO INSTALAR (3 PASSOS):
+────────────────────────
+
+PASSO 1 — RODAR SQL DE UPGRADE
+───────────────────────────────
+1. Abre Supabase → SQL Editor → New query
+2. No VS Code, abre o arquivo: database/upgrade-sprint2.sql
+3. Copia TUDO, cola no Supabase
+4. Clica em RUN
+5. Espera "Success"
+
+⚠️ Esse SQL NÃO apaga teus dados! Só adiciona coisas novas.
+
+
+PASSO 2 — SUBSTITUIR OS ARQUIVOS
+─────────────────────────────────
+Apaga a pasta vetroline antiga e coloca essa nova no lugar.
+OU
+Copia esses arquivos por cima dos antigos:
+  - index.html
+  - js/app.js
+  - js/modules/minhas-os.js (NOVO)
+  - css/style.css
+
+
+PASSO 3 — ABRIR E TESTAR
+─────────────────────────
+1. Abre index.html com Live Server
+2. Loga normal (vai entrar como ADMIN)
+3. Tu vai ver a aba "📱 Minhas OS" no topo
+
+PRA TESTAR COMO FUNCIONÁRIO:
+─────────────────────────────
+1. Cria um usuário FUNCIONÁRIO no Supabase:
+   - Authentication → Add user → Create new user
+   - Coloca email tipo: funcionario1@teste.com / senha 123456
+   - Marca "Auto Confirm User"
+
+2. Linka ele como FUNCIONÁRIO:
+   No SQL Editor cola:
+   
+   insert into public.profiles (id, organization_id, name, role, phone)
+   select id, '00000000-0000-0000-0000-000000000001'::uuid, 'João Funcionário', 'worker', '(49) 88888-7777'
+   from auth.users where email = 'funcionario1@teste.com';
+
+3. Atribui uma OS pra ele:
+   No sistema, vai em Ordens → Edita uma OS → Em "Funcionário" 
+   escolhe "João Funcionário" → Salva
+
+4. SAI do teu usuário (botão Sair)
+
+5. LOGA com funcionario1@teste.com / 123456
+   Vai aparecer SÓ a tela "Minhas OS" — sem dashboard, 
+   sem clientes, sem financeiro.
+
+6. Clica na OS atribuída → vai abrir os detalhes:
+   - Endereço com link pro Google Maps
+   - Telefone clicável
+   - Botões pra mudar status
+   - Botão "Adicionar foto" (se for celular abre câmera!)
+
+
+O QUE AINDA TÁ NA LISTA:
+─────────────────────────
+🔜 Tela de Configurações (preço alumínio, peso barra, etc)
+🔜 Menu lateral em vez do topo
+🔜 Agenda/Calendário
+🔜 Cadastro automático de nova vidraçaria
+🔜 Pagamento libera acesso
+🔜 Limite de funcionários por plano
+🔜 Alerta WhatsApp pra estoque baixo
+🔜 Nota fiscal (último — mais complexo)
+
+
+SE ALGO DER ERRADO:
+───────────────────
+- F12 → aba Console → tira print do erro
+- Manda no Claude pra arrumar
+
+🔥 BORA TESTAR!

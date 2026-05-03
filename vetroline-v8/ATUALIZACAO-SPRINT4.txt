@@ -1,0 +1,190 @@
+═══════════════════════════════════════════════════════════════
+  VetroLine — ATUALIZAÇÃO Sprint 4 + GUIA DE DEPLOY
+═══════════════════════════════════════════════════════════════
+
+OPA ELIAB! Atualização final + tutorial pra mostrar pro pessoal! 🚀
+
+═══════════════════════════════════════════════════════════════
+PARTE 1 — O QUE TEM DE NOVO
+═══════════════════════════════════════════════════════════════
+
+✅ SINO DE NOTIFICAÇÕES (no canto superior direito)
+   - Aparece bolinha vermelha com número quando tem notificação
+   - Chefe recebe notificação quando:
+     * Funcionário tira foto
+     * Funcionário marca OS como concluída
+     * Funcionário sai pra campo
+     * Funcionário cria orçamento na casa do cliente
+
+✅ FUNCIONÁRIO TEM MAIS ACESSO:
+   - Minhas OS
+   - Agenda
+   - Orçamentos (pode criar novos)
+   - Clientes (só visualizar, sem editar)
+   - Estoque (só visualizar, sem editar)
+   - NÃO vê: Financeiro, Produtos, Funcionários, Configurações
+
+✅ MOBILE MUITO MELHOR:
+   - Botões maiores (mais fácil de apertar com o dedo)
+   - Cards adaptados pro celular
+   - Modal ocupa tela inteira
+   - Tudo legível sem precisar dar zoom
+
+
+═══════════════════════════════════════════════════════════════
+PARTE 2 — INSTALAR ATUALIZAÇÃO
+═══════════════════════════════════════════════════════════════
+
+PASSO 1 — RODAR SQL
+1. Supabase → SQL Editor → New query
+2. Abre database/upgrade-sprint4.sql
+3. Copia tudo, cola, RUN
+✅ Não apaga dados
+
+PASSO 2 — SUBSTITUIR PASTA
+1. APAGA pasta vetroline antiga
+2. EXTRAI vetroline-sprint4.zip
+3. RENOMEIA "vetroline-v4" pra "vetroline"
+4. Abre no VS Code
+
+PASSO 3 — TESTAR
+1. Open with Live Server
+2. Loga normalmente
+3. Vai aparecer o sino 🔔 no canto direito
+4. Pra testar notificação:
+   - Sai e loga como funcionário
+   - Tira uma foto numa OS
+   - Sai e loga como chefe de novo
+   - O sino vai ter um número vermelho!
+   - Clica nele e vê a notificação
+
+
+═══════════════════════════════════════════════════════════════
+PARTE 3 — COLOCAR ONLINE PRA PESSOAS USAREM (DEPLOY)
+═══════════════════════════════════════════════════════════════
+
+Hoje teu sistema só roda no teu PC (localhost). Pra OUTRAS PESSOAS 
+acessarem (do celular, de outra cidade, etc), tu precisa colocar
+ONLINE. É grátis e leva 10 minutos. Vou te ensinar:
+
+
+🌐 OPÇÃO 1: NETLIFY (RECOMENDADO - MAIS FÁCIL)
+═══════════════════════════════════════════════
+
+PASSO A) CRIAR CONTA
+1. Abre netlify.com no navegador
+2. Clica em "Sign up"
+3. Escolhe "Sign up with GitHub" ou "Sign up with Email"
+4. Confirma o email
+
+PASSO B) PUBLICAR O SISTEMA
+1. Depois de logado, na tela inicial vai ter um quadradão 
+   escrito: "Drag and drop your site folder here"
+2. ARRASTA a pasta "vetroline" inteira lá pra dentro
+3. Espera uns 30 segundos
+4. PRONTO! Aparece um link tipo:
+   https://nome-aleatorio-123.netlify.app
+
+PASSO C) MUDAR O NOME DO LINK (OPCIONAL)
+1. Clica em "Site configuration" 
+2. "Change site name"
+3. Coloca: "vetroline-sistema" (ou outro disponível)
+4. Salva
+5. Agora teu link vai ser: https://vetroline-sistema.netlify.app
+
+PASSO D) AUTORIZAR NO SUPABASE
+1. Vai no Supabase → Authentication → URL Configuration
+2. Em "Site URL" coloca: https://vetroline-sistema.netlify.app
+3. Em "Redirect URLs" adiciona o mesmo
+4. Salva
+5. Agora o login funciona no link público!
+
+PASSO E) COMPARTILHAR
+1. Manda o link pra quem quiser:
+   https://vetroline-sistema.netlify.app
+2. A pessoa abre no celular ou PC e usa!
+
+
+🔄 COMO ATUALIZAR DEPOIS:
+Quando tu mexer no código:
+1. Volta no Netlify
+2. Clica no teu site
+3. "Deploys" (menu)
+4. Arrasta a pasta vetroline atualizada
+5. Em 30 segundos tá no ar a nova versão
+
+
+═══════════════════════════════════════════════════════════════
+PARTE 4 — CRIANDO USUÁRIOS PRA AS PESSOAS TESTAREM
+═══════════════════════════════════════════════════════════════
+
+Cada VIDRAÇARIA que for testar precisa:
+1. Um usuário no Supabase (Authentication)
+2. Linkar com a vidraçaria DEMO no banco
+
+EXEMPLO — vidraçaria do João vai testar:
+
+PASSO 1: Criar usuário no Supabase
+- Authentication → Add user → Create new user
+- Email: joao@vidracariadojoao.com
+- Senha: 123456
+- Marca "Auto Confirm User"
+
+PASSO 2: Linkar como CHEFE de uma vidraçaria nova
+SQL:
+
+-- Cria a vidraçaria do João
+insert into public.organizations (id, name, cnpj, plan)
+values ('11111111-1111-1111-1111-111111111111', 'Vidraçaria do João', '11.111.111/0001-11', 'trial');
+
+-- Linka o João como ADMIN dela
+insert into public.profiles (id, organization_id, name, role, phone)
+select id, '11111111-1111-1111-1111-111111111111'::uuid, 'João Silva', 'admin', '(49) 99999-0000'
+from auth.users where email = 'joao@vidracariadojoao.com';
+
+-- Cria configurações iniciais
+insert into public.org_settings (organization_id) 
+values ('11111111-1111-1111-1111-111111111111');
+
+PASSO 3: Manda o link e os dados
+"Olha João, testa o sistema:
+- Link: https://vetroline-sistema.netlify.app
+- Email: joao@vidracariadojoao.com  
+- Senha: 123456
+Cada vidraçaria que testa = troca o ID 11111111... pra outro 
+(ex: 22222222-2222-2222-2222-222222222222)"
+
+
+═══════════════════════════════════════════════════════════════
+PARTE 5 — DOMÍNIO PRÓPRIO (QUANDO QUISER FICAR PROFISSIONAL)
+═══════════════════════════════════════════════════════════════
+
+Depois de testar com algumas pessoas, vale comprar um domínio:
+
+1. Vai no registro.br
+2. Busca: vetroline.com.br
+3. Custa em torno de R$ 40/ano
+4. Compra
+5. No Netlify → Domain settings → Add custom domain
+6. Eles te dão DNS pra colocar no registro.br
+7. Em algumas horas teu site vira: https://vetroline.com.br
+
+
+═══════════════════════════════════════════════════════════════
+PARTE 6 — PRÓXIMOS PASSOS (depois disso)
+═══════════════════════════════════════════════════════════════
+
+Quando o sistema tiver gente usando e tu quiser cobrar:
+- Sistema de planos (R$97 = 3 funcionários, R$197 = 10, etc)
+- Pagamento com Asaas (recorrente automático)
+- Cadastro automático de nova vidraçaria
+- Notificações WhatsApp pra estoque baixo
+- Nota fiscal (NFS-e)
+
+Mas isso é DEPOIS. Por enquanto:
+1. Teste com 1-3 vidraçarias amigas (de graça)
+2. Coleta feedback
+3. Ajusta o que tiver de errado
+4. AÍ começa a cobrar
+
+🔥 BORA TESTAR E COLOCAR ONLINE!

@@ -1,0 +1,47 @@
+═══════════════════════════════════════════════════════════════
+  VetroLine — ATUALIZAÇÃO Sprint 7.2 (BUGS DE NOTIFICAÇÃO)
+═══════════════════════════════════════════════════════════════
+
+OPA ELIAB! Atualizei pra arrumar:
+
+✅ Funcionário mandar OS pro chefe (concluído)
+✅ Notificações funcionando direito
+✅ Tratamento de erro melhorado (mensagens claras)
+
+
+═══════════════════════════════════════════════════════════════
+PASSO 1 — RODAR SQL (1 vez)
+═══════════════════════════════════════════════════════════════
+
+1. Supabase → SQL Editor → New query
+2. Cola TUDO de upgrade-sprint7-2.sql
+3. Run
+4. Espera "Success"
+
+
+═══════════════════════════════════════════════════════════════
+PASSO 2 — SUBIR NO GITHUB
+═══════════════════════════════════════════════════════════════
+
+1. Apaga pasta vetroline antiga
+2. Extrai vetroline-sprint7-2.zip
+3. Renomeia "vetroline-v7" pra "vetroline"
+4. GitHub → Add file → Upload files → arrasta tudo
+5. Commit changes
+
+
+═══════════════════════════════════════════════════════════════
+PASSO 3 — TESTAR
+═══════════════════════════════════════════════════════════════
+
+NO CELULAR:
+1. Limpa cache!
+2. Loga como FUNCIONÁRIO
+3. Abre uma OS
+4. Marca alguns cortes ✓
+5. Tira foto 📸
+6. Botão "Concluído" ✅
+7. Volta como ADMIN → vê notificação 🔔
+
+
+🔥 BORA TESTAR!
