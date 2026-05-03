@@ -1,0 +1,73 @@
+═══════════════════════════════════════════════════════════════
+  VetroLine — Sprint 8 — BUGS + NOTIFICAÇÕES MELHORADAS
+═══════════════════════════════════════════════════════════════
+
+ARRUMEI MANO:
+
+✅ BUG: Dashboard mostrava OS dos outros pro funcionário
+   → Agora funcionário só vê OS DELE no Dashboard
+
+✅ BUG: Stats do dashboard mostrando dinheiro pro funcionário
+   → Agora funcionário não vê faturamento (só admin)
+
+✅ MELHORIA: Notificação clicável (admin)
+   → Clica na notif → abre detalhes da OS direto
+
+✅ MELHORIA: Notificação clicável (funcionário)
+   → Clica na notif → abre detalhes da OS dele
+
+✅ NOVO: SOM ao chegar notificação 🔔
+   → Som "ding" duplo igual WhatsApp
+   → Toca quando estiver com o site aberto
+
+✅ NOVO: VIBRAÇÃO ao chegar notificação 📳
+   → Celular vibra (200ms - pausa - 200ms)
+   → Funciona em qualquer celular Android
+
+✅ NOVO: Sino BALANÇA quando chega notif nova
+   → Animação de shake bonita
+
+✅ NOVO: Sino aparece pro FUNCIONÁRIO também
+   → Quando admin mandar algo pro funcionário, ele vê!
+
+✅ NOVO: Toast aparece quando chega notif
+   → Mensagem visual: "🔔 OS-2026-001 concluída!"
+
+✅ MELHORIA: Verifica notificações a cada 15s (era 30s)
+   → Mais rápido pra detectar
+
+
+═══════════════════════════════════════════════════════════════
+PASSO ÚNICO — SUBIR NO GITHUB
+═══════════════════════════════════════════════════════════════
+
+1. Apaga pasta vetroline antiga
+2. Extrai vetroline-sprint8.zip
+3. Renomeia "vetroline-v7" pra "vetroline"
+4. GitHub → Add file → Upload files → arrasta tudo
+5. Commit changes
+6. Vercel atualiza AUTOMÁTICO em segundos!
+
+
+═══════════════════════════════════════════════════════════════
+DEPOIS:
+═══════════════════════════════════════════════════════════════
+
+📱 NO CELULAR: LIMPA O CACHE!
+
+
+═══════════════════════════════════════════════════════════════
+COMO TESTAR O SOM/VIBRAÇÃO:
+═══════════════════════════════════════════════════════════════
+
+1. Abre o site em DUAS abas/dispositivos
+2. Numa: loga como ADMIN
+3. Na outra (ou outro celular): loga como FUNCIONÁRIO
+4. Funcionário marca uma OS como "Concluído"
+5. ⏱️ Espera 15 segundos
+6. 🔔 SOM tocar no celular do admin!
+7. 📳 Celular do admin VIBRA!
+8. Sino BALANÇA na tela!
+
+
+🔥 BORA TESTAR!

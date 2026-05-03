@@ -1,0 +1,126 @@
+═══════════════════════════════════════════════════════════════
+  VetroLine — Sprint 9 — UX MOBILE COMPLETO
+═══════════════════════════════════════════════════════════════
+
+OPA ELIAB! Arrumei TUDO que tu pediu! 🔥
+
+
+✅ TUDO QUE FOI ARRUMADO:
+
+1. ✅ BOTÕES PEGAM DE PRIMEIRA NO CELULAR
+   - Tamanho mínimo 48px (padrão Apple)
+   - Highlight ao tocar (azul)
+   - Anti-double-tap zoom
+   - touch-action otimizado
+
+2. ✅ TELA "CADASTRAR PRODUTO" LIMPA
+   - ❌ Removido: Código
+   - ❌ Removido: Unidade (sempre é Barra de 6m)
+   - 🔄 Categoria virou DROPDOWN: Esquadria, Vidro, Ferragem, Acessório, Outro
+   - ✅ Mantido: Nome, Quantidade, Mínimo, Custo, Fornecedor, Observações
+
+3. ✅ CÂMERA DENTRO DO APP
+   - Câmera traseira automática (melhor pra obra)
+   - HD 1920x1080
+   - Comprime pra JPEG 80% (sobe rápido)
+   - Preview antes de enviar
+   - Botão "Refazer" se ficou ruim
+   - NÃO sai do app
+
+4. ✅ FLUXO PASSO A PASSO (Produção → Campo → Concluído)
+   - Visual com 3 etapas conectadas
+   - Etapa atual ANIMADA
+   - Tem que clicar EM ORDEM (não pula)
+   - Cada passo confirma antes
+   - Botão único por etapa
+
+5. ✅ SAIR AUTOMÁTICO + ABRIR PRÓXIMA OS
+   - Quando concluir → fecha modal automático
+   - Procura próxima OS pendente do funcionário
+   - Abre AUTOMÁTICO a próxima
+   - Mostra "📋 Próxima OS: X"
+   - Se não tiver mais → "🎉 Você terminou todas suas OS!"
+
+6. ✅ SOM FORTE ESTILO WHATSAPP
+   - 3 tons rápidos e fortes
+   - Volume 60-70% (audível)
+   - Frequências altas (1100Hz → 1500Hz → 1800Hz)
+
+7. ✅ VIBRAÇÃO MAIS FORTE
+   - Padrão: vibra-pausa-vibra-pausa-vibra
+   - Duração total: 1.4 segundos
+   - Mais perceptível que antes
+
+8. ✅ NOTIFICAÇÕES SÓ EM MOMENTOS IMPORTANTES (resposta 5C)
+   - "🚚 João saiu pra obra!" → notif chefe
+   - "🎉 OS concluída!" → notif chefe
+   - Em produção NÃO notifica (só interno)
+
+9. ✅ MENSAGEM GRANDE "🆕 NOVO SERVIÇO!" PRO FUNCIONÁRIO
+   - Modal especial em tela cheia
+   - Ícone 🆕 quicando
+   - Som forte + vibração
+   - Botão "👀 Ver Agora" abre OS direto
+
+10. ✅ NOTIFICA FUNCIONÁRIO QUANDO CHEFE ATRIBUI OS
+    - Chefe cria/edita OS e atribui worker
+    - Worker recebe notif com som + vibra + modal
+    - "✅ Funcionário foi notificado!"
+
+11. ✅ BOTÕES "FECHAR" E "CANCELAR" GRANDES
+    - Lado a lado, dedo grande pega
+    - Cancelar: 1/3 da tela
+    - Salvar/Confirmar: 2/3 da tela
+
+
+═══════════════════════════════════════════════════════════════
+PASSO ÚNICO — SUBIR NO GITHUB
+═══════════════════════════════════════════════════════════════
+
+1. Apaga pasta vetroline antiga
+2. Extrai vetroline-sprint9.zip
+3. Renomeia "vetroline-v7" pra "vetroline"
+4. GitHub → Add file → Upload files → arrasta TUDO
+5. Confirma "Replace existing files"
+6. Commit changes
+7. Vercel atualiza AUTOMÁTICO!
+
+
+📱 NO CELULAR: LIMPA O CACHE! (importante!)
+
+
+═══════════════════════════════════════════════════════════════
+COMO TESTAR:
+═══════════════════════════════════════════════════════════════
+
+🧪 TESTE 1: Botões
+- Toca em qualquer botão UMA VEZ
+- ✅ Deve pegar de primeira (não precisa apertar várias vezes)
+
+🧪 TESTE 2: Cadastrar Produto
+- Estoque → Novo Item
+- ✅ Sem campo "Código"
+- ✅ Categoria é dropdown (Esquadria, Vidro, etc)
+- ✅ Sem campo "Unidade"
+
+🧪 TESTE 3: Câmera
+- Abre uma OS → Tirar Foto
+- ✅ Câmera abre DENTRO do app (não sai)
+- ✅ Câmera traseira ativa
+- ✅ Tira foto → Preview → "Usar esta" ou "Refazer"
+
+🧪 TESTE 4: Fluxo Passo a Passo (funcionário)
+- Abre OS pendente
+- ✅ Vê 3 etapas (Produção → Campo → Concluído)
+- ✅ Botão "▶️ Iniciar Produção"
+- Clica → vira "🚚 Sair pra Obra"
+- Clica → vira "✅ Terminei — Avisar Chefe"
+- Clica → ✅ Marca concluído + abre próxima OS
+
+🧪 TESTE 5: Som + Vibração + Modal Novo Serviço
+- 2 celulares: 1 admin, 1 worker
+- Admin: Cria OS nova, atribui pro worker
+- Worker (em até 15s): 🔊 SOM + 📳 VIBRA + 🆕 modal grande!
+
+
+🔥 BORA TESTAR MANO!
