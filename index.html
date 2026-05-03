@@ -190,11 +190,18 @@
       <div></div>
       <button class="btn-action" onclick="Orcamentos.openNew()">➕ Novo Orçamento</button>
     </div>
-    <div class="table-wrapper">
+    
+    <!-- Tabela (desktop) -->
+    <div class="table-wrapper desktop-only">
       <table class="data-table">
         <thead><tr><th>Número</th><th>Cliente</th><th>Criado</th><th>Validade</th><th>Status</th><th class="text-right">Total</th><th>Ações</th></tr></thead>
         <tbody id="orcTableBody"><tr><td colspan="7" class="loading">Carregando...</td></tr></tbody>
       </table>
+    </div>
+    
+    <!-- Cards (mobile) -->
+    <div class="orc-cards-list mobile-only" id="orcCardsList">
+      <div class="loading">Carregando...</div>
     </div>
   </div>
 
@@ -233,13 +240,23 @@
     <div class="screen-title"><h2>Estoque</h2><p>ALUMÍNIO · VIDROS · FERRAGENS</p></div>
     <div class="screen-toolbar">
       <div></div>
-      <button class="btn-action" onclick="Estoque.openNew()">➕ Novo Item</button>
+      <div class="flex gap-12">
+        <button class="btn-action" id="btnEntradaEstoque" onclick="Estoque.openEntry()" style="display: none;">📦 Adicionar Entrada</button>
+        <button class="btn-action" id="btnNovoItem" onclick="Estoque.openNew()">➕ Novo Item</button>
+      </div>
     </div>
-    <div class="table-wrapper">
+    
+    <!-- Tabela (desktop) -->
+    <div class="table-wrapper desktop-only">
       <table class="data-table">
         <thead><tr><th>Código</th><th>Nome</th><th>Categoria</th><th>Quantidade</th><th>Mínimo</th><th>Custo</th><th>Status</th><th>Ações</th></tr></thead>
         <tbody id="estoqueTableBody"><tr><td colspan="8" class="loading">Carregando...</td></tr></tbody>
       </table>
+    </div>
+    
+    <!-- Cards (mobile) -->
+    <div class="estoque-cards-list mobile-only" id="estoqueCardsList">
+      <div class="loading">Carregando...</div>
     </div>
   </div>
 
@@ -518,14 +535,17 @@
   </div>
 </div>
 
-<!-- Modal Orçamento -->
+<!-- Modal Orçamento (ADMIN) -->
 <div class="modal-overlay" id="orcModal">
-  <div class="modal">
+  <div class="modal large">
     <div class="modal-head"><div class="modal-title" id="orcModalTitle">Novo Orçamento</div><button class="modal-close" onclick="Utils.closeModal('orcModal')">×</button></div>
     <div class="modal-body" id="orcForm">
+      <!-- Banner mostrando dados que o funcionário enviou -->
+      <div id="orcTempClientInfo" style="display: none;"></div>
+      
       <div class="form-row">
         <div><label class="form-label">Número</label><input class="form-input" id="orc_number"></div>
-        <div><label class="form-label">Cliente</label><select class="form-select" id="orc_client"></select></div>
+        <div><label class="form-label">Cliente cadastrado</label><select class="form-select" id="orc_client"></select></div>
       </div>
       <div class="form-row">
         <div><label class="form-label">Subtotal</label><input class="form-input" id="orc_subtotal" type="number" step="0.01" oninput="Orcamentos.calculateTotal()"></div>
@@ -543,11 +563,14 @@
             <option value="boleto">Boleto</option><option value="cartao">Cartão</option><option value="parcelado">Parcelado</option>
           </select>
         </div>
-        <div><label class="form-label">Prazo (dias)</label><input class="form-input" id="orc_delivery" type="number"></div>
         <div><label class="form-label">Status</label>
           <select class="form-select" id="orc_status">
-            <option value="draft">Rascunho</option><option value="sent">Enviado</option><option value="accepted">Aceito</option>
-            <option value="rejected">Rejeitado</option><option value="converted">Convertido em OS</option>
+            <option value="draft">Rascunho</option>
+            <option value="pending_review">⏳ Pendente</option>
+            <option value="sent">Enviado</option>
+            <option value="accepted">✅ Aprovado</option>
+            <option value="rejected">❌ Rejeitado</option>
+            <option value="converted">Convertido em OS</option>
           </select>
         </div>
       </div>
@@ -556,6 +579,127 @@
     <div class="modal-footer">
       <button class="btn-secondary" onclick="Utils.closeModal('orcModal')">Cancelar</button>
       <button class="btn-primary" style="width: auto; padding: 10px 24px;" onclick="Orcamentos.save()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Orçamento Rápido FUNCIONÁRIO (sem valores) -->
+<div class="modal-overlay" id="workerOrcModal">
+  <div class="modal large">
+    <div class="modal-head">
+      <div class="modal-title" id="workerOrcModalTitle">⚡ Novo Orçamento</div>
+      <button class="modal-close" onclick="Utils.closeModal('workerOrcModal')">×</button>
+    </div>
+    <div class="modal-body" id="workerOrcForm">
+      <p style="color: var(--text-dim); font-size: 0.85rem; margin-bottom: 16px;">
+        Preenche os dados que tu pegou na casa do cliente. Tira foto pra mostrar pro chefe!
+      </p>
+      
+      <div class="config-section-title" style="margin-top: 0;">👤 DADOS DO CLIENTE</div>
+      <div class="form-group">
+        <label class="form-label">Nome do cliente *</label>
+        <input class="form-input" id="worker_client_name" placeholder="Ex: João Silva">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Telefone</label>
+        <input class="form-input" id="worker_client_phone" placeholder="(00) 00000-0000">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Endereço</label>
+        <input class="form-input" id="worker_client_address" placeholder="Rua, número, bairro, cidade">
+      </div>
+      
+      <div class="config-section-title" style="margin-top: 24px;">🔧 SERVIÇO</div>
+      <div class="form-group">
+        <label class="form-label">Tipo de serviço *</label>
+        <input class="form-input" id="worker_service_type" placeholder="Ex: Box vidro 8mm temperado">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Medidas</label>
+        <input class="form-input" id="worker_measurements" placeholder="Ex: 1,20m x 2,00m">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Observações detalhadas</label>
+        <textarea class="form-textarea" id="worker_notes" placeholder="Detalhes do serviço, dificuldades, prazo, tudo o que for importante..."></textarea>
+      </div>
+      
+      <div class="config-section-title" style="margin-top: 24px;">📸 FOTOS DO LUGAR</div>
+      <div class="photos-grid" id="workerOrcPhotos"></div>
+      <label class="upload-btn">
+        📷 Tirar/Adicionar foto
+        <input type="file" accept="image/*" capture="environment" onchange="Orcamentos.uploadWorkerOrcPhoto(event)" style="display: none;">
+      </label>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="Utils.closeModal('workerOrcModal')">Cancelar</button>
+      <button class="btn-primary" id="workerOrcSaveBtn" style="width: auto; padding: 10px 24px;" onclick="Orcamentos.saveWorker()">💾 Enviar pro Chefe</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Detalhe Orçamento FUNCIONÁRIO -->
+<div class="modal-overlay" id="workerOrcDetailModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">⚡ Detalhes do Orçamento</div>
+      <button class="modal-close" onclick="Utils.closeModal('workerOrcDetailModal')">×</button>
+    </div>
+    <div class="modal-body" id="workerOrcDetailBody"></div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="Utils.closeModal('workerOrcDetailModal')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Entrada de Estoque -->
+<div class="modal-overlay" id="entryModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">📦 Adicionar Entrada</div>
+      <button class="modal-close" onclick="Utils.closeModal('entryModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="color: var(--text-dim); font-size: 0.85rem; margin-bottom: 16px;">
+        Procura o produto que chegou e adiciona a quantidade.
+      </p>
+      
+      <div class="form-group">
+        <label class="form-label">🔍 Buscar produto</label>
+        <input class="form-input" id="entry_search" placeholder="Digite nome, código ou categoria..." oninput="Estoque.searchProduct()">
+      </div>
+      
+      <div id="entry_results" class="search-results"></div>
+      
+      <div id="entry_notFound" style="display: none; padding: 16px; background: #ffd93d15; border: 1px solid #ffd93d30; border-radius: 8px; margin-bottom: 16px;">
+        <div style="color: var(--warning); font-weight: 700; margin-bottom: 8px;">⚠️ Produto não cadastrado!</div>
+        <div style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 12px;">
+          Esse produto não tá no sistema. Quer cadastrar agora?
+        </div>
+        <button class="btn-primary" style="width: 100%;" onclick="Estoque.openNewProduct()">➕ Cadastrar Produto Novo</button>
+      </div>
+      
+      <div id="entry_selected" style="display: none;">
+        <div class="info-banner" style="margin-bottom: 16px;">
+          <div style="font-weight: 800; margin-bottom: 4px;">📦 Produto selecionado:</div>
+          <div id="entry_selected_name" style="font-size: 1rem; color: var(--primary);"></div>
+          <div id="entry_selected_info" style="font-size: 0.8rem; color: var(--text-dim); margin-top: 4px;"></div>
+          <button class="btn-secondary" style="margin-top: 12px; width: 100%;" onclick="Estoque.clearSelected()">Trocar produto</button>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Quantidade que chegou *</label>
+          <input class="form-input" id="entry_quantity" type="number" step="0.01" placeholder="Ex: 10">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Observações</label>
+          <textarea class="form-textarea" id="entry_observations" placeholder="Ex: Alumínio chegou torto, vidro com risco..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="Utils.closeModal('entryModal')">Cancelar</button>
+      <button class="btn-primary" id="entrySaveBtn" style="width: auto; padding: 10px 24px;" onclick="Estoque.saveEntry()">💾 Salvar Entrada</button>
     </div>
   </div>
 </div>
@@ -580,7 +724,7 @@
         <div><label class="form-label">Quantidade</label><input class="form-input" id="inv_quantity" type="number" step="0.01"></div>
         <div><label class="form-label">Mínimo</label><input class="form-input" id="inv_min_quantity" type="number" step="0.01"></div>
       </div>
-      <div class="form-row">
+      <div class="form-row admin-only-field">
         <div><label class="form-label">Custo (R$)</label><input class="form-input" id="inv_cost" type="number" step="0.01"></div>
         <div><label class="form-label">Fornecedor</label><input class="form-input" id="inv_supplier"></div>
       </div>

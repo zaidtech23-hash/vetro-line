@@ -1,8 +1,8 @@
 // ═══════════════════════════════════════════════════════════════
-// VETROLINE — APLICAÇÃO PRINCIPAL v4
+// VETROLINE — APLICAÇÃO PRINCIPAL v7
 // ═══════════════════════════════════════════════════════════════
-// Worker agora pode ver: Minhas OS, Estoque (read), Orçamentos, Clientes
-// Worker NÃO vê: Financeiro, Produtos, Funcionários, Configurações
+// Funcionário NÃO vê Clientes (tirado)
+// Botão Sair arrumado pro mobile
 // ═══════════════════════════════════════════════════════════════
 
 const App = {
@@ -10,7 +10,7 @@ const App = {
   PERMISSIONS: {
     admin:   ['dashboard','agenda','ordens','orcamentos','clientes','produtos','estoque','financeiro','funcionarios','configuracoes'],
     manager: ['dashboard','agenda','ordens','orcamentos','clientes','produtos','estoque','financeiro','funcionarios','configuracoes'],
-    worker:  ['minhas-os','agenda','orcamentos','clientes','estoque']
+    worker:  ['minhas-os','agenda','orcamentos','estoque']
   },
 
   canAccess(screen) {
@@ -76,7 +76,7 @@ const App = {
   },
 
   async logout() {
-    if (!await Utils.confirm('Sair do sistema?')) return;
+    if (!confirm('Sair do sistema?')) return;
     Notifications.stop();
     await Auth.logout();
   },
@@ -92,7 +92,6 @@ const App = {
     document.getElementById('topUserName').textContent = APP_STATE.profile.name;
     document.getElementById('topUserOrg').textContent = APP_STATE.organization.name;
     
-    // Esconde sino se for worker (só admin recebe notificações)
     const bell = document.getElementById('notifBell');
     if (bell) {
       bell.style.display = this.isAdmin() ? 'flex' : 'none';
@@ -168,26 +167,22 @@ const App = {
         case 'minhas-os': await MinhasOS.load(); break;
       }
       
-      // Bloqueia botões de criar/editar/deletar pra worker
-      this.applyWorkerRestrictions();
+      // Mostra botões certos no estoque
+      if (screenId === 'estoque') {
+        const btnEntrada = document.getElementById('btnEntradaEstoque');
+        const btnNovoItem = document.getElementById('btnNovoItem');
+        if (this.isWorker()) {
+          if (btnEntrada) btnEntrada.style.display = '';
+          if (btnNovoItem) btnNovoItem.style.display = 'none';
+        } else {
+          if (btnEntrada) btnEntrada.style.display = 'none';
+          if (btnNovoItem) btnNovoItem.style.display = '';
+        }
+      }
       
     } catch (err) {
       console.error('Erro ao carregar tela:', err);
       Utils.toast('Erro ao carregar dados', 'error');
-    }
-  },
-
-  applyWorkerRestrictions() {
-    if (!this.isWorker()) return;
-
-    // Worker NÃO pode criar/editar/deletar em Estoque e Clientes
-    const screensReadOnly = ['estoque', 'clientes'];
-    if (screensReadOnly.includes(APP_STATE.currentScreen)) {
-      const screen = document.getElementById('screen-' + APP_STATE.currentScreen);
-      if (screen) {
-        screen.querySelectorAll('.btn-action, .icon-btn').forEach(btn => btn.style.display = 'none');
-        screen.querySelectorAll('.screen-toolbar > div:last-child').forEach(d => d.style.display = 'none');
-      }
     }
   },
 

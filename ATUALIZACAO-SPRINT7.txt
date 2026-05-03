@@ -1,0 +1,132 @@
+═══════════════════════════════════════════════════════════════
+  VetroLine — ATUALIZAÇÃO Sprint 7 (BUGS + GRANDES MUDANÇAS)
+═══════════════════════════════════════════════════════════════
+
+OPA ELIAB! Atualizei TUDO! Vamos passo a passo!
+
+
+═══════════════════════════════════════════════════════════════
+O QUE FOI ARRUMADO:
+═══════════════════════════════════════════════════════════════
+
+✅ Botão "Sair do Sistema" arrumado (vermelho, no fim do menu)
+✅ Tirado "Clientes" do menu do funcionário
+✅ Orçamento do funcionário SEM valores (só dados do cliente, foto, medidas)
+✅ Orçamento do administrador continua COM valores
+✅ Sistema de pendência → admin revisa e aprova
+✅ Botão "Virar Cliente" depois que orçamento for aprovado
+✅ Estoque: funcionário busca produto, adiciona quantidade que chegou
+✅ Estoque: funcionário pode cadastrar produto novo (sem valores)
+✅ Tudo responsivo no celular (cards bonitos)
+
+
+═══════════════════════════════════════════════════════════════
+PASSO 1 — RODAR SQL (1 vez só)
+═══════════════════════════════════════════════════════════════
+
+1. Supabase → SQL Editor → New query
+2. Abre database/upgrade-sprint7.sql no VS Code
+3. Copia tudo, cola no Supabase, RUN
+4. Espera "Success"
+
+
+═══════════════════════════════════════════════════════════════
+PASSO 2 — CRIAR BUCKETS NO SUPABASE (CRÍTICO!)
+═══════════════════════════════════════════════════════════════
+
+Pra fotos funcionarem (das OS e orçamentos), criar 2 buckets:
+
+A) BUCKET DAS FOTOS DE OS:
+1. Supabase → Storage (menu da esquerda)
+2. Clica "New bucket" 
+3. Nome: os-photos
+4. Public bucket: ✅ MARCA
+5. Save
+
+B) BUCKET DAS FOTOS DE ORÇAMENTO:
+1. Mesmo lugar → "New bucket"
+2. Nome: quote-photos
+3. Public bucket: ✅ MARCA
+4. Save
+
+C) CONFIGURAR PERMISSÕES (em cada bucket):
+1. Clica no bucket (os-photos)
+2. Aba "Policies" 
+3. "New policy" → "Get started quickly"
+4. Escolhe "Allow access to all users"
+5. Save policy
+6. REPETE pro quote-photos
+
+Isso vai resolver o "Bucket not found" das fotos!
+
+
+═══════════════════════════════════════════════════════════════
+PASSO 3 — SUBIR ATUALIZAÇÃO NO GITHUB
+═══════════════════════════════════════════════════════════════
+
+1. Apaga pasta vetroline antiga
+2. Extrai vetroline-sprint7.zip
+3. Renomeia "vetroline-v7" pra "vetroline"
+4. Abre teu repositório vetro-line no GitHub
+5. Add file → Upload files
+6. Arrasta TODOS arquivos de dentro da pasta vetroline
+7. Confirma "Replace existing files" se aparecer
+8. Commit changes
+9. Em 30 segundos tá no ar
+
+
+═══════════════════════════════════════════════════════════════
+PASSO 4 — TESTAR
+═══════════════════════════════════════════════════════════════
+
+ANTES DE TESTAR: limpa cache do navegador!
+- Chrome → 3 pontinhos → Histórico → Limpar dados → 
+  marca "Imagens e arquivos em cache" → Limpar
+
+TESTE COMO ADMIN:
+1. Loga como admin
+2. Menu lateral abre? ✅
+3. Botão "Sair do Sistema" aparece e funciona? ✅
+4. Vai em Funcionários → cria um funcionário novo
+
+TESTE COMO FUNCIONÁRIO:
+1. Sai e loga com o funcionário criado
+2. Menu lateral: vê "Minhas OS, Agenda, Orçamentos, Estoque"
+   (NÃO vê: Clientes, Funcionários, Financeiro, Configurações)
+3. Vai em Orçamentos → "Novo Orçamento"
+   - Preenche nome, telefone, endereço, serviço, medidas
+   - Tira foto do lugar
+   - Salva (vai pro chefe)
+4. Vai em Estoque → "Adicionar Entrada"
+   - Procura "alumínio"
+   - Seleciona um produto
+   - Coloca quantidade (ex: 10)
+   - Observação opcional
+   - Salva
+
+TESTE NOTIFICAÇÃO:
+1. Volta como admin
+2. Vê o sino 🔔 com bolinha vermelha (notificações)
+3. Clica → vê os avisos
+
+TESTE FLUXO COMPLETO:
+1. Como admin, vai em Orçamentos
+2. Acha o orçamento que o funcionário criou (status "Pendente")
+3. Clica no 👁️ pra abrir
+4. Vê os dados do cliente + fotos do funcionário
+5. Coloca subtotal, mão de obra, desconto, total
+6. Muda status pra "Aprovado"
+7. Salva
+8. Volta na lista, clica em ✨ "Virar Cliente"
+9. Cliente é cadastrado automaticamente!
+
+
+═══════════════════════════════════════════════════════════════
+SE DER ALGUM ERRO:
+═══════════════════════════════════════════════════════════════
+
+❌ "Bucket not found" → fazer PASSO 2 (criar buckets)
+❌ Não atualiza no celular → limpar cache do Chrome
+❌ Erro genérico → F12 → Console → print do erro
+
+🔥 BORA TESTAR!

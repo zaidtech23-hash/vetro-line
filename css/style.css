@@ -1296,3 +1296,207 @@ body {
   opacity: 0.5;
 }
 
+
+/* ═══════════════════════════════════════════════════════════════
+   SPRINT 7 — Cards mobile + busca + banner
+   ═══════════════════════════════════════════════════════════════ */
+
+/* CARDS DE ORÇAMENTO (mobile) */
+.orc-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.orc-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.orc-card:active { transform: scale(0.98); }
+.orc-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.orc-card-number {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.orc-card-client {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-top: 2px;
+}
+.orc-card-info {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+.orc-card-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+.orc-card-total {
+  font-weight: 800;
+  color: var(--primary);
+}
+
+/* CARDS DE ESTOQUE (mobile) */
+.estoque-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.estoque-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+}
+.estoque-card.low { border-color: #ef476f30; }
+.estoque-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+.estoque-card-code {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+.estoque-card-name {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-top: 2px;
+}
+.estoque-card-info {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+.estoque-card-info > div { margin-bottom: 4px; }
+.estoque-card-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+/* RESULTADOS DE BUSCA */
+.search-results {
+  margin-bottom: 16px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+.search-result-item {
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--bg-darkest);
+}
+.search-result-item:hover, .search-result-item:active {
+  border-color: var(--primary);
+  background: #00c9ff10;
+}
+.search-result-name {
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.search-result-info {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* BANNER DE INFO */
+.info-banner {
+  background: #ffd93d10;
+  border: 1px solid #ffd93d30;
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 16px;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+.info-banner > div { margin-bottom: 4px; }
+
+/* CONFIG SECTION TITLE (reutilizado) */
+.config-section-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+  color: var(--primary);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+
+/* MOBILE — APRIMORAMENTOS GERAIS */
+@media (max-width: 768px) {
+  .orc-card { padding: 12px; }
+  .estoque-card { padding: 12px; }
+  
+  .estoque-card-actions {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .search-result-item { padding: 14px; }
+  .info-banner { padding: 12px; font-size: 0.8rem; }
+}
+
+/* SIDEBAR FOOTER fix definitivo */
+.sidebar {
+  display: flex !important;
+  flex-direction: column !important;
+}
+.sidebar-nav {
+  flex: 1 1 auto !important;
+  overflow-y: auto !important;
+  padding-bottom: 16px !important;
+}
+.sidebar-foot {
+  flex-shrink: 0 !important;
+  padding: 16px !important;
+  background: var(--bg-card) !important;
+  border-top: 1px solid var(--border) !important;
+  position: sticky !important;
+  bottom: 0 !important;
+}
+.sidebar-logout {
+  width: 100% !important;
+  padding: 14px !important;
+  background: #ef476f15 !important;
+  border: 1px solid #ef476f60 !important;
+  border-radius: 8px !important;
+  color: var(--danger) !important;
+  font-family: inherit !important;
+  font-size: 0.9rem !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  text-align: center !important;
+}
+.sidebar-logout:active {
+  background: #ef476f30 !important;
+  transform: scale(0.98) !important;
+}
+
