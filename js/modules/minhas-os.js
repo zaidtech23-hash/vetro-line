@@ -128,19 +128,48 @@ const MinhasOS = {
 
       ${os.status !== 'done' ? `
         <div class="detail-section">
-          <div class="detail-label">Atualizar Status</div>
-          <div class="status-buttons">
-            <button class="status-btn ${os.status === 'in_production' ? 'active' : ''}" onclick="MinhasOS.updateStatus('in_production')">🏭 Em produção</button>
-            <button class="status-btn ${os.status === 'in_field' ? 'active' : ''}" onclick="MinhasOS.updateStatus('in_field')">🚚 Em campo</button>
+          <div class="detail-label">📍 Etapa atual: <strong style="color: var(--primary);">${Utils.statusLabel(os.status)}</strong></div>
+          <div class="step-flow">
+            <div class="step ${['in_production','in_field','done'].includes(os.status) ? 'completed' : os.status === 'pending' ? 'current' : ''}">
+              <div class="step-icon">🏭</div>
+              <div class="step-label">Produção</div>
+            </div>
+            <div class="step-arrow">→</div>
+            <div class="step ${['in_field','done'].includes(os.status) ? 'completed' : os.status === 'in_production' ? 'current' : ''}">
+              <div class="step-icon">🚚</div>
+              <div class="step-label">Em campo</div>
+            </div>
+            <div class="step-arrow">→</div>
+            <div class="step ${os.status === 'done' ? 'completed' : os.status === 'in_field' ? 'current' : ''}">
+              <div class="step-icon">✅</div>
+              <div class="step-label">Concluído</div>
+            </div>
           </div>
-          <button class="btn-finish" onclick="MinhasOS.finishAndNotify()">
-            ✅ Terminei — Avisar Chefe
-          </button>
+          
+          <div class="step-action">
+            ${os.status === 'pending' ? `
+              <button class="btn-step-next" onclick="MinhasOS.advanceStep('in_production')">
+                ▶️ Iniciar Produção
+              </button>
+              <p class="step-hint">Comece a produzir as peças no atelier</p>
+            ` : os.status === 'in_production' ? `
+              <button class="btn-step-next" onclick="MinhasOS.advanceStep('in_field')">
+                🚚 Sair pra Obra
+              </button>
+              <p class="step-hint">Quando sair pra casa do cliente</p>
+            ` : os.status === 'in_field' ? `
+              <button class="btn-finish" onclick="MinhasOS.finishAndNotify()">
+                ✅ Terminei — Avisar Chefe
+              </button>
+              <p class="step-hint">Quando finalizar o serviço no cliente</p>
+            ` : ''}
+          </div>
         </div>
       ` : `
         <div class="detail-section">
-          <div class="info-banner" style="background: #06d6a015; border-color: #06d6a040; color: var(--secondary);">
-            ✅ <strong>Serviço concluído!</strong> O chefe já foi notificado.
+          <div class="info-banner" style="background: #06d6a015; border-color: #06d6a040; color: var(--secondary); text-align: center; padding: 16px;">
+            ✅ <strong>Serviço concluído!</strong><br>
+            <span style="font-size: 0.85rem; color: var(--text-dim);">O chefe já foi notificado.</span>
           </div>
         </div>
       `}
@@ -163,10 +192,9 @@ const MinhasOS = {
               `).join('')
           }
         </div>
-        <label class="upload-btn">
-          📷 Tirar/Adicionar foto
-          <input type="file" accept="image/*" capture="environment" onchange="MinhasOS.uploadPhoto(event)" style="display: none;">
-        </label>
+        <button type="button" class="upload-btn" onclick="Camera.open(MinhasOS.uploadPhoto.bind(MinhasOS))">
+          📷 Tirar Foto
+        </button>
       </div>
 
       <div class="detail-section">
@@ -188,19 +216,71 @@ const MinhasOS = {
     `;
   },
 
+  // Avança 1 etapa (Pendente → Produção → Em campo)
+  async advanceStep(newStatus) {
+    if (!this.currentOS) return;
+    
+    const labels = {
+      'in_production': '🏭 Iniciar produção?',
+      'in_field': '🚚 Confirma que tá saindo pra obra?'
+    };
+    
+    if (!await Utils.confirm(labels[newStatus] || 'Avançar etapa?')) return;
+    
+    await this.updateStatus(newStatus, true); // true = mostrar toast com som
+  },
+
   async finishAndNotify() {
     if (!this.currentOS) return;
     
-    if (!await Utils.confirm('Marcar como concluído e avisar o chefe?')) return;
+    if (!await Utils.confirm('🎉 Marcar como concluído e avisar o chefe?')) return;
     
-    await this.updateStatus('done');
+    const osTerminada = this.currentOS;
     
-    setTimeout(() => {
+    await this.updateStatus('done', true);
+    
+    // Espera um pouco e procura próxima OS pra abrir
+    setTimeout(async () => {
       Utils.toast('✅ Chefe avisado! Bom trabalho! 💪', 'success');
+      
+      // Procura próxima OS pendente do funcionário
+      try {
+        const { data: proximaOS } = await sb
+          .from('service_orders')
+          .select('*, clients(*)')
+          .eq('worker_id', APP_STATE.user.id)
+          .neq('id', osTerminada.id)
+          .neq('status', 'done')
+          .neq('status', 'cancelled')
+          .order('due_date', { ascending: true })
+          .limit(1);
+        
+        if (proximaOS && proximaOS.length > 0) {
+          // Tem próxima OS — fecha atual, abre nova
+          setTimeout(() => {
+            Utils.closeModal('osDetailModal');
+            setTimeout(() => {
+              Utils.toast(`📋 Próxima OS: ${proximaOS[0].title}`, 'info');
+              this.openDetail(proximaOS[0].id);
+            }, 600);
+          }, 1500);
+        } else {
+          // Não tem mais OS — só fecha
+          setTimeout(() => {
+            Utils.closeModal('osDetailModal');
+            Utils.toast('🎉 Você terminou todas suas OS!', 'success');
+            this.list();
+          }, 1500);
+        }
+      } catch (err) {
+        console.warn('Erro buscando próxima OS:', err);
+        Utils.closeModal('osDetailModal');
+        this.list();
+      }
     }, 800);
   },
 
-  async updateStatus(newStatus) {
+  async updateStatus(newStatus, withFeedback = false) {
     if (!this.currentOS) return;
 
     const btn = event?.target;
@@ -220,14 +300,15 @@ const MinhasOS = {
 
       Utils.toast(`✅ ${Utils.statusLabel(newStatus)}`);
       
-      // NOTIFICAÇÃO PRO CHEFE (não bloqueia se der erro)
+      // NOTIFICAÇÃO PRO CHEFE (só em momentos IMPORTANTES: Em campo + Concluído)
+      // Em produção é só interno, não notifica chefe
       try {
         if (newStatus === 'done') {
           await Notifications.create({
             recipientRole: 'admin',
             type: 'os_completed',
-            title: `OS ${this.currentOS.os_number} concluída!`,
-            message: `${APP_STATE.profile.name} marcou como concluído: ${this.currentOS.title}`,
+            title: `🎉 OS ${this.currentOS.os_number} CONCLUÍDA!`,
+            message: `${APP_STATE.profile.name} terminou: ${this.currentOS.title}`,
             relatedId: this.currentOS.id,
             relatedType: 'service_order'
           });
@@ -235,21 +316,13 @@ const MinhasOS = {
           await Notifications.create({
             recipientRole: 'admin',
             type: 'os_started',
-            title: `OS ${this.currentOS.os_number} em campo`,
-            message: `${APP_STATE.profile.name} saiu pra fazer: ${this.currentOS.title}`,
-            relatedId: this.currentOS.id,
-            relatedType: 'service_order'
-          });
-        } else if (newStatus === 'in_production') {
-          await Notifications.create({
-            recipientRole: 'admin',
-            type: 'os_production',
-            title: `OS ${this.currentOS.os_number} em produção`,
-            message: `${APP_STATE.profile.name} começou: ${this.currentOS.title}`,
+            title: `🚚 ${APP_STATE.profile.name} saiu pra obra!`,
+            message: `OS ${this.currentOS.os_number}: ${this.currentOS.title}`,
             relatedId: this.currentOS.id,
             relatedType: 'service_order'
           });
         }
+        // in_production NÃO manda notif (só interno)
       } catch (notifErr) {
         console.warn('Notificação não foi criada:', notifErr);
       }

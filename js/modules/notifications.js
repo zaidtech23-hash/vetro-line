@@ -6,14 +6,164 @@ const Notifications = {
 
   unreadCount: 0,
   pollInterval: null,
+  lastNotificationId: null, // Pra detectar notificação NOVA
+  soundEnabled: true,
+  audioContext: null,
 
   async start() {
     await this.loadCount();
-    this.pollInterval = setInterval(() => this.loadCount(), 30000);
+    await this.captureLatest(); // Salva qual é a última, sem tocar som ainda
+    this.pollInterval = setInterval(() => this.checkNew(), 15000); // Check a cada 15s
   },
 
   stop() {
     if (this.pollInterval) clearInterval(this.pollInterval);
+  },
+
+  // Captura o ID da última notificação atual (sem tocar som)
+  async captureLatest() {
+    try {
+      const { data } = await sb
+        .from('notifications')
+        .select('id')
+        .order('created_at', { ascending: false })
+        .limit(1);
+      
+      if (data && data.length > 0) {
+        this.lastNotificationId = data[0].id;
+      }
+    } catch (e) {
+      console.warn('Erro capturando última notif:', e);
+    }
+  },
+
+  // Verifica se chegou notificação nova
+  async checkNew() {
+    try {
+      const { data } = await sb
+        .from('notifications')
+        .select('id, title, message, type, read, related_id, related_type')
+        .order('created_at', { ascending: false })
+        .limit(5);
+      
+      if (!data || data.length === 0) return;
+      
+      const newest = data[0];
+      
+      // Se mudou e não é nossa primeira vez = notificação nova!
+      if (this.lastNotificationId && newest.id !== this.lastNotificationId && !newest.read) {
+        this.lastNotificationId = newest.id;
+        this.playNotificationSound();
+        this.vibrate();
+        await this.loadCount();
+        
+        // Tipo "new_os_assigned" = funcionário recebeu OS nova → modal grande
+        if (newest.type === 'new_os_assigned' && APP_STATE.profile?.role === 'worker') {
+          this.showNewOSModal(newest);
+        } else {
+          this.showInAppToast(newest.title);
+        }
+      } else if (newest.id !== this.lastNotificationId) {
+        this.lastNotificationId = newest.id;
+        await this.loadCount();
+      }
+    } catch (e) {
+      console.warn('Erro checando novas:', e);
+    }
+  },
+  
+  // Modal GRANDE quando chega OS nova pro funcionário
+  showNewOSModal(notif) {
+    const modal = document.getElementById('newOSAlertModal');
+    const titleEl = document.getElementById('newOSAlertTitle');
+    const msgEl = document.getElementById('newOSAlertMsg');
+    const btnVer = document.getElementById('newOSAlertVer');
+    
+    if (!modal) {
+      // Fallback se modal não existir
+      this.showInAppToast(notif.title);
+      return;
+    }
+    
+    titleEl.textContent = notif.title || '🆕 Novo Serviço!';
+    msgEl.textContent = notif.message || 'O chefe acabou de te atribuir uma OS nova.';
+    
+    btnVer.onclick = async () => {
+      // Marca como lida
+      await sb.from('notifications').update({ read: true }).eq('id', notif.id);
+      Utils.closeModal('newOSAlertModal');
+      
+      // Abre a OS direto
+      if (notif.related_id) {
+        setTimeout(() => {
+          App.showScreen('minhas-os');
+          setTimeout(() => {
+            if (typeof MinhasOS !== 'undefined' && MinhasOS.openDetail) {
+              MinhasOS.openDetail(notif.related_id);
+            }
+          }, 300);
+        }, 200);
+      }
+    };
+    
+    Utils.openModal('newOSAlertModal');
+  },
+
+  // Toca som FORTE estilo WhatsApp (gerado, sem precisar de arquivo)
+  playNotificationSound() {
+    if (!this.soundEnabled) return;
+    try {
+      if (!this.audioContext) {
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      const ctx = this.audioContext;
+      
+      // Som tipo WhatsApp: "ti-tiim" (3 tons mais altos)
+      const playTone = (freq, startTime, duration, volume = 0.6) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = freq;
+        osc.type = 'sine';
+        gain.gain.setValueAtTime(0, startTime);
+        gain.gain.linearRampToValueAtTime(volume, startTime + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+        osc.start(startTime);
+        osc.stop(startTime + duration);
+      };
+      
+      const now = ctx.currentTime;
+      // Sequência tipo notif do WhatsApp — 3 tons rápidos e fortes
+      playTone(1100, now, 0.15, 0.6);            // Tom 1
+      playTone(1500, now + 0.1, 0.15, 0.6);      // Tom 2
+      playTone(1800, now + 0.2, 0.25, 0.7);      // Tom 3 (mais forte)
+    } catch (e) {
+      console.warn('Erro tocando som:', e);
+    }
+  },
+
+  // Vibração FORTE (padrão de alerta)
+  vibrate() {
+    try {
+      if ('vibrate' in navigator) {
+        // Padrão: vibra forte, pausa, vibra forte, pausa, vibra forte
+        navigator.vibrate([300, 150, 300, 150, 500]);
+      }
+    } catch (e) {
+      console.warn('Erro vibrando:', e);
+    }
+  },
+
+  // Toast visual quando chega notif nova
+  showInAppToast(title) {
+    Utils.toast(`🔔 ${title}`, 'info');
+    // Faz o sino balançar
+    const bell = document.getElementById('notifBell');
+    if (bell) {
+      bell.classList.add('shake');
+      setTimeout(() => bell.classList.remove('shake'), 1000);
+    }
   },
 
   async loadCount() {
@@ -122,16 +272,62 @@ const Notifications = {
   },
 
   async handleClick(id, relatedType, relatedId) {
+    // Marca como lida
     await sb.from('notifications').update({ read: true, read_at: new Date().toISOString() }).eq('id', id);
     await this.loadCount();
 
     Utils.closeModal('notifModal');
 
-    if (relatedType === 'service_order' && relatedId) {
-      App.showScreen('ordens');
-    } else if (relatedType === 'quote' && relatedId) {
-      App.showScreen('orcamentos');
-    }
+    // Aguarda um pouco pra modal fechar
+    setTimeout(async () => {
+      try {
+        if (relatedType === 'service_order' && relatedId) {
+          // Busca a OS completa
+          const { data: os, error } = await sb
+            .from('service_orders')
+            .select('*, clients(*), profiles!service_orders_worker_id_fkey(name)')
+            .eq('id', relatedId)
+            .single();
+          
+          if (error || !os) {
+            Utils.toast('OS não encontrada', 'error');
+            return;
+          }
+          
+          // Abre o detalhe certo conforme o role
+          if (APP_STATE.profile?.role === 'worker') {
+            // Worker abre o modal de "Minhas OS"
+            App.showScreen('minhas-os');
+            setTimeout(() => {
+              if (typeof MinhasOS !== 'undefined' && MinhasOS.openDetail) {
+                MinhasOS.openDetail(relatedId);
+              }
+            }, 300);
+          } else {
+            // Admin abre na tela de Ordens
+            App.showScreen('ordens');
+            setTimeout(() => {
+              if (typeof Ordens !== 'undefined' && Ordens.openEdit) {
+                Ordens.openEdit(relatedId);
+              }
+            }, 300);
+          }
+        } else if (relatedType === 'quote' && relatedId) {
+          App.showScreen('orcamentos');
+          setTimeout(() => {
+            if (typeof Orcamentos !== 'undefined' && Orcamentos.openEdit) {
+              Orcamentos.openEdit(relatedId);
+            }
+          }, 300);
+        } else {
+          // Sem relação específica, vai pra tela default
+          if (relatedType) Utils.toast(`Notificação: ${relatedType}`, 'info');
+        }
+      } catch (e) {
+        console.error('Erro abrindo detalhes:', e);
+        Utils.toast('Erro abrindo detalhes', 'error');
+      }
+    }, 200);
 
     setTimeout(() => this.loadList(), 100);
   },

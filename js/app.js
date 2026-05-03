@@ -94,7 +94,7 @@ const App = {
     
     const bell = document.getElementById('notifBell');
     if (bell) {
-      bell.style.display = this.isAdmin() ? 'flex' : 'none';
+      bell.style.display = 'flex'; // Sino pra TODOS (admin e worker)
     }
     
     this.applyPermissions();

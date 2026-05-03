@@ -1691,3 +1691,258 @@ body {
   animation: pulse-bell 1.5s ease-in-out infinite;
 }
 
+
+/* ═══════════════════════════════════════════════════════════════
+   SPRINT 8 — Animação do sino + nova notificação
+   ═══════════════════════════════════════════════════════════════ */
+
+@keyframes shake-bell {
+  0%, 100% { transform: rotate(0); }
+  10%, 30%, 50%, 70% { transform: rotate(-15deg); }
+  20%, 40%, 60%, 80% { transform: rotate(15deg); }
+}
+
+.notif-bell.shake {
+  animation: shake-bell 0.8s ease-in-out;
+}
+
+/* Item de notificação clicável */
+.notif-item {
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.notif-item:active {
+  background: var(--bg-darkest);
+}
+.notif-item.unread {
+  background: #00c9ff10;
+}
+.notif-item.unread:active {
+  background: #00c9ff20;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   SPRINT 9 — UX MOBILE COMPLETO
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ——— BOTÕES — pegam de primeira no celular ——— */
+.btn-primary, .btn-secondary, .btn-finish, .btn-step-next, .btn-danger,
+.upload-btn, .modal-close, .menu-toggle, .notif-bell, .add-btn,
+.status-btn, button {
+  -webkit-tap-highlight-color: rgba(0, 201, 255, 0.3);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Tamanho mínimo pra dedo (44px Apple guidelines) */
+.btn-primary, .btn-secondary, .btn-finish, .btn-danger {
+  min-height: 48px;
+  font-size: 0.95rem;
+  padding: 14px 18px;
+}
+
+.btn-secondary {
+  background: #1a233280;
+  border: 1.5px solid var(--border);
+  color: var(--text);
+}
+
+.btn-secondary:active {
+  background: var(--bg-darkest);
+  transform: scale(0.97);
+}
+
+.modal-close {
+  width: 44px;
+  height: 44px;
+  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close:active {
+  background: var(--bg-darkest);
+  transform: scale(0.92);
+}
+
+/* ——— STEP FLOW (passo a passo) ——— */
+.step-flow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+  margin-bottom: 12px;
+  gap: 4px;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  opacity: 0.4;
+  transition: all 0.3s;
+}
+
+.step.completed {
+  opacity: 1;
+}
+
+.step.completed .step-icon {
+  background: var(--secondary);
+  color: var(--bg-darkest);
+}
+
+.step.current {
+  opacity: 1;
+  animation: pulse-step 2s ease-in-out infinite;
+}
+
+.step.current .step-icon {
+  background: var(--gradient);
+  color: var(--bg-darkest);
+  box-shadow: 0 0 20px rgba(0, 201, 255, 0.5);
+}
+
+.step-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--bg-darkest);
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  margin-bottom: 6px;
+}
+
+.step-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-align: center;
+}
+
+.step.completed .step-label,
+.step.current .step-label {
+  color: var(--text);
+}
+
+.step-arrow {
+  color: var(--text-muted);
+  font-size: 1rem;
+  font-weight: 800;
+  margin: 0 -4px;
+  margin-bottom: 18px;
+}
+
+@keyframes pulse-step {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* ——— BOTÃO DE ETAPA (avançar passo) ——— */
+.btn-step-next {
+  width: 100%;
+  margin-top: 8px;
+  background: var(--gradient);
+  color: var(--bg-darkest);
+  border: none;
+  padding: 14px 18px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  box-shadow: 0 4px 16px rgba(0, 201, 255, 0.25);
+  min-height: 48px;
+}
+
+.btn-step-next:active {
+  transform: scale(0.98);
+}
+
+.step-action {
+  margin-top: 12px;
+}
+
+.step-hint {
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* ——— UPLOAD BUTTON (foto) ——— */
+.upload-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  background: var(--gradient);
+  color: var(--bg-darkest);
+  padding: 14px;
+  border-radius: 10px;
+  font-weight: 800;
+  text-align: center;
+  cursor: pointer;
+  font-size: 0.95rem;
+  border: none;
+  font-family: inherit;
+  min-height: 48px;
+  letter-spacing: 0.3px;
+}
+
+.upload-btn:active {
+  transform: scale(0.98);
+}
+
+/* ——— MODAL DA CÂMERA ——— */
+.camera-modal {
+  max-height: 100vh;
+  height: 100vh;
+  border-radius: 0;
+}
+
+.camera-modal video,
+.camera-modal img {
+  display: block;
+  margin: 0 auto;
+}
+
+/* ——— ANIMAÇÃO BOUNCE (modal Novo Serviço) ——— */
+@keyframes bounce {
+  from { transform: translateY(0); }
+  to { transform: translateY(-12px); }
+}
+
+/* ——— STATUS BTN MELHORADO ——— */
+.status-btn {
+  min-height: 48px;
+  font-size: 0.85rem;
+  padding: 12px 8px;
+}
+
+.status-btn:active {
+  transform: scale(0.97);
+}
+
+/* ——— MODAL FOOTER (botões lado a lado) ——— */
+.modal-footer {
+  display: flex;
+  gap: 10px;
+  padding: 14px 16px;
+}
+
+.modal-footer .btn-primary,
+.modal-footer .btn-secondary {
+  flex: 1;
+  min-height: 48px;
+}
+

@@ -288,10 +288,8 @@ const Estoque = {
 
     this.editingId = id;
     document.getElementById('estoqueModalTitle').textContent = 'Editar Item';
-    document.getElementById('inv_code').value = data.code || '';
     document.getElementById('inv_name').value = data.name || '';
     document.getElementById('inv_category').value = data.category || '';
-    document.getElementById('inv_unit').value = data.unit || 'un';
     document.getElementById('inv_quantity').value = data.quantity || 0;
     document.getElementById('inv_min_quantity').value = data.min_quantity || 0;
     document.getElementById('inv_cost').value = data.cost || 0;
@@ -305,10 +303,9 @@ const Estoque = {
   async save() {
     const payload = {
       organization_id: APP_STATE.organization.id,
-      code: document.getElementById('inv_code').value.trim(),
       name: document.getElementById('inv_name').value.trim(),
       category: document.getElementById('inv_category').value.trim(),
-      unit: document.getElementById('inv_unit').value,
+      unit: 'barra', // padrão fixo (barras de 6m)
       quantity: parseFloat(document.getElementById('inv_quantity').value) || 0,
       min_quantity: parseFloat(document.getElementById('inv_min_quantity').value) || 0,
       notes: document.getElementById('inv_notes').value.trim()
@@ -320,6 +317,7 @@ const Estoque = {
     }
 
     if (!payload.name) { Utils.toast('Nome é obrigatório', 'error'); return; }
+    if (!payload.category) { Utils.toast('Escolha a categoria', 'error'); return; }
 
     let result;
     if (this.editingId) {

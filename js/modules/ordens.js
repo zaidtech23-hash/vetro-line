@@ -108,13 +108,53 @@ const Ordens = {
 
     if (!payload.title) { Utils.toast('Título obrigatório', 'error'); return; }
 
+    // Verifica se mudou o worker (pra avisar funcionário novo)
+    let workerChanged = false;
+    let oldWorkerId = null;
+    if (this.editingId) {
+      const { data: oldOS } = await sb.from('service_orders').select('worker_id').eq('id', this.editingId).single();
+      oldWorkerId = oldOS?.worker_id;
+      workerChanged = oldWorkerId !== payload.worker_id;
+    }
+
     let result;
-    if (this.editingId) result = await sb.from('service_orders').update(payload).eq('id', this.editingId);
-    else result = await sb.from('service_orders').insert(payload);
+    let savedOS;
+    if (this.editingId) {
+      result = await sb.from('service_orders').update(payload).eq('id', this.editingId).select().single();
+      savedOS = result.data;
+    } else {
+      result = await sb.from('service_orders').insert(payload).select().single();
+      savedOS = result.data;
+    }
 
     if (result.error) { Utils.toast('Erro: ' + result.error.message, 'error'); return; }
 
-    Utils.toast(this.editingId ? 'OS atualizada!' : 'OS criada!');
+    // 🚨 NOTIFICAR FUNCIONÁRIO se atribuiu OS pra ele (caso novo OU mudou worker)
+    if (payload.worker_id && (!this.editingId || workerChanged)) {
+      try {
+        // Busca nome do worker
+        const { data: workerProfile } = await sb.from('profiles').select('name').eq('id', payload.worker_id).single();
+        
+        await sb.from('notifications').insert({
+          organization_id: APP_STATE.organization.id,
+          recipient_id: payload.worker_id, // notifica especificamente esse worker
+          recipient_role: 'worker',
+          type: 'new_os_assigned',
+          title: `🆕 Nova OS pra você!`,
+          message: `${payload.title} — Toque pra ver detalhes`,
+          related_id: savedOS.id,
+          related_type: 'service_order',
+          created_by: APP_STATE.user.id
+        });
+        
+        Utils.toast(`✅ ${workerProfile?.name || 'Funcionário'} foi notificado!`, 'success');
+      } catch (notifErr) {
+        console.warn('Erro notificando worker:', notifErr);
+      }
+    } else {
+      Utils.toast(this.editingId ? 'OS atualizada!' : 'OS criada!');
+    }
+    
     Utils.closeModal('osModal');
     await this.list();
   },
