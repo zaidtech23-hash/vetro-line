@@ -8,9 +8,9 @@
 const App = {
 
   PERMISSIONS: {
-    admin:   ['dashboard','agenda','ordens','orcamentos','clientes','produtos','estoque','financeiro','funcionarios','configuracoes'],
-    manager: ['dashboard','agenda','ordens','orcamentos','clientes','produtos','estoque','financeiro','funcionarios','configuracoes'],
-    worker:  ['minhas-os','agenda','orcamentos','estoque']
+    admin:   ['dashboard','agenda','historico','ordens','orcamentos','clientes','produtos','estoque','financeiro','funcionarios','configuracoes'],
+    manager: ['dashboard','agenda','historico','ordens','orcamentos','clientes','produtos','estoque','financeiro','funcionarios','configuracoes'],
+    worker:  ['minhas-os','agenda','historico','orcamentos','estoque']
   },
 
   canAccess(screen) {
@@ -165,6 +165,7 @@ const App = {
         case 'funcionarios': await Funcionarios.load(); break;
         case 'configuracoes': await Configuracoes.load(); break;
         case 'minhas-os': await MinhasOS.load(); break;
+        case 'historico': await Historico.list(); break;
       }
       
       // Mostra botões certos no estoque

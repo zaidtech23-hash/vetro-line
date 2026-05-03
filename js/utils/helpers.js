@@ -128,9 +128,67 @@ const Utils = {
     }, 3000);
   },
 
-  // CONFIRMA AÇÃO DESTRUTIVA
-  async confirm(message) {
-    return window.confirm(message);
+  // CONFIRMA AÇÃO COM MODAL CUSTOMIZADO (mais bonito que o nativo)
+  async confirm(message, options = {}) {
+    return new Promise((resolve) => {
+      const {
+        title = 'Confirmar ação',
+        icon = '⚠️',
+        okText = 'Sim, confirmar',
+        cancelText = 'Cancelar',
+        type = 'warning' // warning, danger, info
+      } = typeof options === 'string' ? { title: options } : options;
+      
+      // Cria modal se não existir
+      let modal = document.getElementById('customConfirmModal');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'customConfirmModal';
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+          <div class="modal confirm-modal">
+            <div class="modal-body" style="padding: 32px 20px;">
+              <div class="confirm-icon" id="confirmIcon">⚠️</div>
+              <div class="confirm-title" id="confirmTitle">Confirmar?</div>
+              <div class="confirm-message" id="confirmMessage"></div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn-secondary" id="confirmCancelBtn">Cancelar</button>
+              <button class="btn-primary" id="confirmOkBtn">Confirmar</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+      }
+      
+      // Atualiza conteúdo
+      document.getElementById('confirmIcon').textContent = icon;
+      document.getElementById('confirmTitle').textContent = title;
+      document.getElementById('confirmMessage').textContent = message;
+      document.getElementById('confirmCancelBtn').textContent = cancelText;
+      const okBtn = document.getElementById('confirmOkBtn');
+      okBtn.textContent = okText;
+      
+      // Cor do botão OK conforme tipo
+      if (type === 'danger') {
+        okBtn.style.background = 'linear-gradient(135deg, #ef476f, #d63354)';
+      } else {
+        okBtn.style.background = '';
+      }
+      
+      // Mostra modal
+      modal.classList.add('active');
+      
+      // Handler dos botões (substitui sempre pra evitar múltiplos listeners)
+      const cleanup = () => {
+        modal.classList.remove('active');
+        okBtn.onclick = null;
+        document.getElementById('confirmCancelBtn').onclick = null;
+      };
+      
+      okBtn.onclick = () => { cleanup(); resolve(true); };
+      document.getElementById('confirmCancelBtn').onclick = () => { cleanup(); resolve(false); };
+    });
   },
 
   // ABRE MODAL

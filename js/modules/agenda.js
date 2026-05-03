@@ -155,21 +155,45 @@ const Agenda = {
         ` : ''}
       `;
     } else {
-      body.innerHTML = dayEvents.map(e => `
-        <div class="list-item">
-          <div class="dot ${e.status === 'done' ? 'done' : e.status === 'in_field' ? 'going' : 'wait'}"></div>
-          <div class="flex-1">
-            <div class="item-name">${e.title}</div>
-            <div class="item-sub">${e.clients?.name || '—'} · ${e.profiles?.name || 'Sem responsável'}</div>
+      body.innerHTML = dayEvents.map(e => {
+        // Define qual função abre detalhe (worker vs admin)
+        const isWorker = APP_STATE.profile?.role === 'worker';
+        const openFn = isWorker ? `Agenda.openOSFromCalendar('${e.id}', true)` : `Agenda.openOSFromCalendar('${e.id}', false)`;
+        
+        return `
+          <div class="list-item" style="cursor: pointer;" onclick="${openFn}">
+            <div class="dot ${e.status === 'done' ? 'done' : e.status === 'in_field' ? 'going' : 'wait'}"></div>
+            <div class="flex-1">
+              <div class="item-name">${e.title}</div>
+              <div class="item-sub">${e.clients?.name || '—'} · ${e.profiles?.name || 'Sem responsável'}</div>
+            </div>
+            <span class="tag ${e.status}">${Utils.statusLabel(e.status)}</span>
           </div>
-          <span class="tag ${e.status}">${Utils.statusLabel(e.status)}</span>
-        </div>
-      `).join('') + (App.isAdmin() ? `
+        `;
+      }).join('') + (App.isAdmin() ? `
         <button class="btn-primary mt-16" onclick="Agenda.scheduleNew('${dateStr}')">➕ Agendar mais um</button>
       ` : '');
     }
 
     Utils.openModal('dayDetailModal');
+  },
+  
+  // Abre detalhe completo da OS a partir do calendário
+  openOSFromCalendar(osId, isWorker) {
+    Utils.closeModal('dayDetailModal');
+    setTimeout(() => {
+      if (isWorker) {
+        // Worker: abre o modal de detalhe da OS
+        if (typeof MinhasOS !== 'undefined' && MinhasOS.openDetail) {
+          MinhasOS.openDetail(osId);
+        }
+      } else {
+        // Admin: abre o modal de edição da OS
+        if (typeof Ordens !== 'undefined' && Ordens.openEdit) {
+          Ordens.openEdit(osId);
+        }
+      }
+    }, 250);
   },
 
   scheduleNew(dateStr) {

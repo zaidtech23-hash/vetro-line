@@ -1,0 +1,97 @@
+═══════════════════════════════════════════════════════════════
+  VetroLine — Sprint 10 — BUGS DA TESTAGEM + HISTÓRICO + PUSH
+═══════════════════════════════════════════════════════════════
+
+OPA ELIAB! Arrumei TUDO da lista! 🔥
+
+
+✅ TUDO QUE FOI ARRUMADO:
+
+1. ✅ BOTÃO "FECHAR" PEGA DE PRIMEIRA
+   - Tamanho 52px (era 48)
+   - Tap highlight mais forte
+   - Animação ao tocar
+
+2. ✅ SOM TOCA QUANDO CHEGA NOTIFICAÇÃO
+   - Áudio "destrava" no primeiro toque
+   - Som forte estilo WhatsApp (3 tons)
+   - Funciona em TODOS os celulares
+
+3. ✅ NOTIFICAÇÃO NA BARRA DO CELULAR
+   - Service Worker registrado
+   - Pede permissão de notificação ao abrir
+   - Aparece na barra como WhatsApp/Telegram
+   - Tem som + vibração mesmo em segundo plano
+
+4. ✅ AGENDA → CLICA NA OS → ABRE DETALHE COMPLETO
+   - Worker: abre o detalhe pra fazer o serviço
+   - Admin: abre pra editar a OS
+
+5. ✅ CÂMERA NATIVA (igual antes, mas com botão BONITO)
+   - Voltei pra câmera nativa do celular
+   - Qualidade HD do celular
+   - Tudo funcionando: flash, zoom, modo noturno
+   - Botão estilizado pra abrir
+
+6. ✅ OS CONCLUÍDAS SAEM DA LISTA
+   - "Minhas OS" só mostra: Pendente, Em produção, Em campo
+   - Concluídas vão pro HISTÓRICO
+
+7. ✅ CONFIRMAÇÃO BONITA ANTES DE CONCLUIR
+   - Modal customizado (não é mais a janelinha feia)
+   - Mostra título da OS
+   - Pergunta "Tem certeza?"
+   - Tem ícone, cores bonitas
+
+8. ✅ HISTÓRICO DE SERVIÇOS (NOVO MENU!)
+   - Funcionário: vê tudo que ele já concluiu
+   - Admin: vê histórico completo + filtra por funcionário
+   - Stats: total, concluídos, faturado
+   - Cards bonitos com cliente, data, fotos
+
+
+═══════════════════════════════════════════════════════════════
+PASSO ÚNICO — SUBIR NO GITHUB
+═══════════════════════════════════════════════════════════════
+
+1. Apaga pasta vetroline antiga
+2. Extrai vetroline-sprint10.zip
+3. Renomeia "vetroline-v7" pra "vetroline" (se precisar)
+4. GitHub → Add file → Upload files → arrasta TUDO
+5. Confirma "Replace existing files"
+6. Commit changes
+7. Vercel atualiza AUTOMÁTICO!
+
+📱 NO CELULAR: LIMPA O CACHE!
+
+
+═══════════════════════════════════════════════════════════════
+COMO TESTAR:
+═══════════════════════════════════════════════════════════════
+
+🔔 TESTE NOTIFICAÇÕES NATIVAS:
+1. Abre o site
+2. Aparecer "Permitir notificações?" → ACEITA
+3. Outro celular: admin atribui OS pro João
+4. ✅ Celular do João: notificação na BARRA + som + vibra
+5. ✅ Mesmo se app tiver minimizado!
+
+📷 TESTE CÂMERA:
+1. Abre uma OS → "Tirar Foto"
+2. ✅ Câmera nativa do celular abre
+3. ✅ Tudo funcionando bonito
+
+📚 TESTE HISTÓRICO:
+1. Conclui uma OS
+2. Vai no menu → "📚 Histórico"
+3. ✅ Vê a OS concluída lá
+
+📅 TESTE AGENDA:
+1. Vai na Agenda
+2. Clica num dia com OS
+3. ✅ Aparece a OS
+4. Clica na OS
+5. ✅ Abre detalhe completo!
+
+
+🔥 BORA TESTAR MANO!

@@ -9,8 +9,20 @@ const Notifications = {
   lastNotificationId: null, // Pra detectar notificação NOVA
   soundEnabled: true,
   audioContext: null,
+  audioUnlocked: false, // Audio só funciona após primeiro clique do user
+  swRegistration: null, // Service Worker
+  notifPermission: 'default', // granted, denied, default
 
   async start() {
+    // Registra o Service Worker pra push notifications
+    await this.registerServiceWorker();
+    
+    // Pede permissão de notificação (aparece UMA VEZ)
+    await this.requestNotificationPermission();
+    
+    // Adiciona listener pra desbloquear áudio no primeiro toque
+    this.setupAudioUnlock();
+    
     await this.loadCount();
     await this.captureLatest(); // Salva qual é a última, sem tocar som ainda
     this.pollInterval = setInterval(() => this.checkNew(), 15000); // Check a cada 15s
@@ -18,6 +30,95 @@ const Notifications = {
 
   stop() {
     if (this.pollInterval) clearInterval(this.pollInterval);
+  },
+  
+  // Registra Service Worker (pra notificações fora do app)
+  async registerServiceWorker() {
+    if (!('serviceWorker' in navigator)) {
+      console.warn('Service Worker não suportado');
+      return;
+    }
+    
+    try {
+      this.swRegistration = await navigator.serviceWorker.register('/sw.js');
+      console.log('[Notif] Service Worker registrado!');
+      
+      // Escuta clicks de notificação
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data?.type === 'NOTIFICATION_CLICKED') {
+          const data = event.data.data || {};
+          if (data.osId) {
+            // Abre a OS que foi clicada
+            App.showScreen(APP_STATE.profile?.role === 'worker' ? 'minhas-os' : 'ordens');
+            setTimeout(() => {
+              if (APP_STATE.profile?.role === 'worker') {
+                MinhasOS?.openDetail(data.osId);
+              } else {
+                Ordens?.openEdit(data.osId);
+              }
+            }, 400);
+          }
+        }
+      });
+    } catch (err) {
+      console.warn('[Notif] Erro registrando SW:', err);
+    }
+  },
+  
+  // Pede permissão pra notificar (sem ser invasivo)
+  async requestNotificationPermission() {
+    if (!('Notification' in window)) {
+      console.warn('Notificações não suportadas');
+      return;
+    }
+    
+    this.notifPermission = Notification.permission;
+    
+    // Se já tá granted ou denied, não pede de novo
+    if (this.notifPermission === 'default') {
+      // Espera 3 segundos antes de pedir (pra não ser intrusivo)
+      setTimeout(async () => {
+        try {
+          const result = await Notification.requestPermission();
+          this.notifPermission = result;
+          console.log('[Notif] Permissão:', result);
+        } catch (e) {
+          console.warn('Erro pedindo permissão:', e);
+        }
+      }, 3000);
+    }
+  },
+  
+  // Desbloqueia o áudio na primeira interação do user
+  setupAudioUnlock() {
+    const unlock = () => {
+      if (this.audioUnlocked) return;
+      
+      try {
+        if (!this.audioContext) {
+          this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        // Toca um som silencioso pra "destravar"
+        const buffer = this.audioContext.createBuffer(1, 1, 22050);
+        const source = this.audioContext.createBufferSource();
+        source.buffer = buffer;
+        source.connect(this.audioContext.destination);
+        source.start(0);
+        
+        if (this.audioContext.state === 'suspended') {
+          this.audioContext.resume();
+        }
+        
+        this.audioUnlocked = true;
+        console.log('[Notif] Áudio desbloqueado!');
+      } catch (e) {
+        console.warn('Erro desbloqueando áudio:', e);
+      }
+    };
+    
+    // Desbloqueia em qualquer toque/clique
+    document.addEventListener('touchstart', unlock, { once: true });
+    document.addEventListener('click', unlock, { once: true });
   },
 
   // Captura o ID da última notificação atual (sem tocar som)
@@ -57,6 +158,9 @@ const Notifications = {
         this.vibrate();
         await this.loadCount();
         
+        // 🔔 SHOW NATIVE OS NOTIFICATION (aparece na barra do celular!)
+        this.showOSNotification(newest);
+        
         // Tipo "new_os_assigned" = funcionário recebeu OS nova → modal grande
         if (newest.type === 'new_os_assigned' && APP_STATE.profile?.role === 'worker') {
           this.showNewOSModal(newest);
@@ -69,6 +173,41 @@ const Notifications = {
       }
     } catch (e) {
       console.warn('Erro checando novas:', e);
+    }
+  },
+  
+  // 🔔 Mostra notificação NATIVA do celular (aparece na barra mesmo com app fechado)
+  showOSNotification(notif) {
+    if (this.notifPermission !== 'granted') return;
+    
+    try {
+      const title = notif.title || 'VetroLine';
+      const body = notif.message || 'Você tem uma nova notificação';
+      const data = {
+        osId: notif.related_id,
+        type: notif.type
+      };
+      
+      // Se tem Service Worker, usa ele (funciona com app em segundo plano)
+      if (this.swRegistration && this.swRegistration.active) {
+        this.swRegistration.active.postMessage({
+          type: 'SHOW_NOTIFICATION',
+          title: title,
+          body: body,
+          tag: `vetroline-${notif.id}`,
+          data: data
+        });
+      } else {
+        // Fallback: notificação simples (só funciona com app aberto)
+        new Notification(title, {
+          body: body,
+          tag: `vetroline-${notif.id}`,
+          vibrate: [300, 150, 300, 150, 500],
+          data: data
+        });
+      }
+    } catch (e) {
+      console.warn('Erro mostrando notificação OS:', e);
     }
   },
   

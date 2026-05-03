@@ -11,9 +11,12 @@ const MinhasOS = {
   },
 
   async list() {
+    // Filtra: só mostra OS pendente, em produção, em campo (ATIVAS)
+    // Concluídas e canceladas vão pro Histórico
     const { data, error } = await sb
       .from('service_orders')
       .select('id, os_number, title, description, status, priority, due_date, photos, clients(name, address, city)')
+      .in('status', ['pending', 'in_production', 'in_field'])
       .order('due_date', { ascending: true });
 
     const container = document.getElementById('minhasOSList');
@@ -26,9 +29,9 @@ const MinhasOS = {
     if (!data || data.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
-          <div class="icon">📋</div>
-          <div class="title">Nenhuma OS atribuída</div>
-          <div class="sub">Quando o chefe te atribuir, vai aparecer aqui</div>
+          <div class="icon">🎉</div>
+          <div class="title">Nenhum serviço pendente!</div>
+          <div class="sub">Tu tá em dia. Veja o histórico no menu pra ver os concluídos.</div>
         </div>
       `;
       return;
@@ -220,12 +223,23 @@ const MinhasOS = {
   async advanceStep(newStatus) {
     if (!this.currentOS) return;
     
-    const labels = {
-      'in_production': '🏭 Iniciar produção?',
-      'in_field': '🚚 Confirma que tá saindo pra obra?'
+    const config = {
+      'in_production': {
+        title: 'Iniciar Produção?',
+        icon: '🏭',
+        message: `OS: ${this.currentOS.title}\n\nVai começar a produzir as peças no atelier.`,
+        okText: '▶️ Sim, iniciar'
+      },
+      'in_field': {
+        title: 'Sair pra Obra?',
+        icon: '🚚',
+        message: `OS: ${this.currentOS.title}\n\nO chefe vai ser avisado que tu tá indo pra casa do cliente.`,
+        okText: '🚚 Sim, sair'
+      }
     };
     
-    if (!await Utils.confirm(labels[newStatus] || 'Avançar etapa?')) return;
+    const opts = config[newStatus] || { title: 'Avançar etapa?' };
+    if (!await Utils.confirm(opts.message || 'Avançar etapa?', opts)) return;
     
     await this.updateStatus(newStatus, true); // true = mostrar toast com som
   },
@@ -233,7 +247,16 @@ const MinhasOS = {
   async finishAndNotify() {
     if (!this.currentOS) return;
     
-    if (!await Utils.confirm('🎉 Marcar como concluído e avisar o chefe?')) return;
+    const ok = await Utils.confirm(
+      `OS: ${this.currentOS.title}\n\nTem certeza que TERMINOU o serviço? O chefe vai ser avisado.`,
+      {
+        title: 'Concluir Serviço?',
+        icon: '✅',
+        okText: '🎉 Sim, terminei!',
+        cancelText: 'Ainda não'
+      }
+    );
+    if (!ok) return;
     
     const osTerminada = this.currentOS;
     

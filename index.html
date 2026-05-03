@@ -69,6 +69,9 @@
       <div class="sidebar-item" data-screen="agenda" onclick="App.showScreen('agenda')">
         <span class="sidebar-icon">📅</span> Agenda
       </div>
+      <div class="sidebar-item" data-screen="historico" onclick="App.showScreen('historico')">
+        <span class="sidebar-icon">📚</span> Histórico
+      </div>
 
       <div class="sidebar-section">Operação</div>
       <div class="sidebar-item" data-screen="ordens" onclick="App.showScreen('ordens')">
@@ -166,6 +169,23 @@
   <div id="screen-minhas-os" class="screen">
     <div class="screen-title"><h2>Minhas Ordens de Serviço</h2><p>SERVIÇOS ATRIBUÍDOS A VOCÊ</p></div>
     <div class="os-mobile-list" id="minhasOSList"><div class="loading">Carregando...</div></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       HISTÓRICO (funcionário + admin)
+       ═══════════════════════════════════════════════════════════ -->
+  <div id="screen-historico" class="screen">
+    <div class="screen-title"><h2>📚 Histórico de Serviços</h2><p>SERVIÇOS CONCLUÍDOS</p></div>
+    
+    <!-- Filtro só aparece pra admin -->
+    <div id="historicoFilters" style="margin-bottom: 16px;">
+      <label class="form-label">Filtrar por funcionário:</label>
+      <select class="form-select" id="historicoWorkerFilter" onchange="Historico.filterByWorker(this.value)">
+        <option value="">— Todos os funcionários —</option>
+      </select>
+    </div>
+    
+    <div class="os-mobile-list" id="historicoList"><div class="loading">Carregando...</div></div>
   </div>
 
   <!-- ORDENS -->
@@ -865,35 +885,6 @@
   </div>
 </div>
 
-<!-- Modal Câmera (tirar foto dentro do app) -->
-<div class="modal-overlay" id="cameraModal">
-  <div class="modal camera-modal">
-    <div class="modal-head">
-      <div class="modal-title">📷 Tirar Foto</div>
-      <button class="modal-close" onclick="Camera.close()">×</button>
-    </div>
-    <div class="modal-body" style="padding: 0; background: #000;">
-      <!-- ETAPA 1: Câmera ao vivo -->
-      <div id="cameraStep1">
-        <video id="cameraVideo" autoplay playsinline muted style="width: 100%; max-height: 60vh; background: #000; display: block;"></video>
-        <canvas id="cameraCanvas" style="display: none;"></canvas>
-      </div>
-      <!-- ETAPA 2: Preview da foto -->
-      <div id="cameraStep2" style="display: none;">
-        <img id="cameraPreview" style="width: 100%; max-height: 60vh; background: #000; display: block; object-fit: contain;">
-      </div>
-    </div>
-    <div class="modal-footer" id="cameraFooter1">
-      <button class="btn-secondary" style="flex: 1;" onclick="Camera.close()">Cancelar</button>
-      <button class="btn-primary" style="flex: 2;" onclick="Camera.capture()">📸 Tirar Foto</button>
-    </div>
-    <div class="modal-footer" id="cameraStep2Footer" style="display: none;">
-      <button class="btn-secondary" style="flex: 1;" onclick="Camera.retake()">🔄 Refazer</button>
-      <button class="btn-primary" style="flex: 2;" onclick="Camera.confirm()">✅ Usar Esta</button>
-    </div>
-  </div>
-</div>
-
 <!-- Modal Notificações -->
 <div class="modal-overlay" id="notifModal">
   <div class="modal">
@@ -930,6 +921,7 @@
 <script src="js/modules/notifications.js"></script>
 <script src="js/modules/camera.js"></script>
 <script src="js/modules/minhas-os.js"></script>
+<script src="js/modules/historico.js"></script>
 <script src="js/app.js"></script>
 
 </body>
