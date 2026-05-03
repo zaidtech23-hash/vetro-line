@@ -1500,3 +1500,194 @@ body {
   transform: scale(0.98) !important;
 }
 
+
+/* ═══════════════════════════════════════════════════════════════
+   SPRINT 7.3 — Botão "Terminei" + responsividade reforçada
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Botão Terminei - Avisar Chefe */
+.btn-finish {
+  width: 100%;
+  margin-top: 10px;
+  background: linear-gradient(135deg, #06d6a0, #00c9ff);
+  color: var(--bg-darkest);
+  border: none;
+  padding: 13px 16px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 800;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  box-shadow: 0 4px 16px rgba(6, 214, 160, 0.25);
+  transition: all 0.2s;
+}
+.btn-finish:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 8px rgba(6, 214, 160, 0.3);
+}
+.btn-finish:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* RESPONSIVIDADE REFORÇADA — Mobile First */
+
+/* Status buttons em grid 2 colunas no mobile */
+@media (max-width: 768px) {
+  .status-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  
+  .status-btn {
+    padding: 11px 8px;
+    font-size: 0.78rem;
+    text-align: center;
+    line-height: 1.2;
+  }
+  
+  /* Modal mobile - tela cheia */
+  .modal {
+    max-height: 95vh;
+    border-radius: 16px 16px 0 0;
+  }
+  
+  .modal-body {
+    padding: 14px 16px;
+  }
+  
+  .modal-footer {
+    padding: 12px 16px;
+    gap: 8px;
+  }
+  
+  .modal-footer .btn-secondary,
+  .modal-footer .btn-primary {
+    padding: 11px 12px;
+    font-size: 0.82rem;
+    flex: 1;
+  }
+  
+  /* Detail sections com padding menor */
+  .detail-section {
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+  }
+  
+  /* Form inputs maiores pra dedo */
+  .form-input,
+  .form-textarea,
+  .form-select {
+    padding: 12px 12px;
+    font-size: 0.9rem;
+    min-height: 44px;
+  }
+  
+  /* Form rows viram coluna no mobile */
+  .form-row {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Cards grid */
+  .estoque-cards-list,
+  .orc-cards-list {
+    gap: 10px;
+  }
+  
+  /* Action buttons fica responsivo */
+  .estoque-card-actions,
+  .func-actions {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  
+  .func-actions button {
+    font-size: 0.72rem;
+    padding: 9px 4px;
+  }
+  
+  /* Photos grid pequeno */
+  .photos-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+  
+  .photo-thumb {
+    aspect-ratio: 1;
+  }
+  
+  /* Sidebar full width quase */
+  .sidebar {
+    width: 88%;
+    max-width: 320px;
+  }
+  
+  /* Toast não quebra */
+  .toast {
+    max-width: 88vw;
+    text-align: center;
+    word-break: break-word;
+    white-space: normal;
+    padding: 12px 18px;
+    font-size: 0.82rem;
+  }
+  
+  /* Botão Finish destacado no mobile */
+  .btn-finish {
+    padding: 14px 12px;
+    font-size: 0.95rem;
+  }
+}
+
+/* Telas EXTRA pequenas (320px-360px) */
+@media (max-width: 380px) {
+  .screen {
+    padding: 16px 12px 60px;
+  }
+  
+  .screen-title h2 {
+    font-size: 1.3rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  
+  .stat-card {
+    padding: 12px;
+    gap: 8px;
+  }
+  
+  .stat-value {
+    font-size: 1.05rem;
+  }
+  
+  .stat-label {
+    font-size: 0.62rem;
+  }
+  
+  .top-bar {
+    padding: 0 12px;
+  }
+  
+  .top-logo {
+    font-size: 1rem;
+  }
+  
+  .modal-title {
+    font-size: 0.92rem;
+  }
+}
+
+/* Notificação visível ao receber novo aviso */
+@keyframes pulse-bell {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+.notif-bell.has-new {
+  animation: pulse-bell 1.5s ease-in-out infinite;
+}
+

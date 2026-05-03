@@ -148,18 +148,31 @@ const Notifications = {
   },
 
   async create({ recipientRole = 'admin', type, title, message, relatedId = null, relatedType = null }) {
-    const { error } = await sb.from('notifications').insert({
-      organization_id: APP_STATE.organization.id,
-      recipient_role: recipientRole,
-      type,
-      title,
-      message,
-      related_id: relatedId,
-      related_type: relatedType,
-      created_by: APP_STATE.user.id
-    });
+    try {
+      const payload = {
+        organization_id: APP_STATE.organization.id,
+        recipient_role: recipientRole,
+        type,
+        title,
+        message,
+        created_by: APP_STATE.user.id
+      };
+      
+      // Só inclui se tiver valor
+      if (relatedId) payload.related_id = relatedId;
+      if (relatedType) payload.related_type = relatedType;
+      
+      const { error } = await sb.from('notifications').insert(payload);
 
-    if (error) console.error('Erro ao criar notificação:', error);
+      if (error) {
+        console.error('Erro ao criar notificação:', error);
+        return false;
+      }
+      return true;
+    } catch (err) {
+      console.error('Exception ao criar notificação:', err);
+      return false;
+    }
   }
 
 };

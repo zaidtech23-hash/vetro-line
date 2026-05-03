@@ -126,14 +126,24 @@ const MinhasOS = {
         </div>
       </div>
 
-      <div class="detail-section">
-        <div class="detail-label">Atualizar Status</div>
-        <div class="status-buttons">
-          <button class="status-btn ${os.status === 'in_production' ? 'active' : ''}" onclick="MinhasOS.updateStatus('in_production')">🏭 Produção</button>
-          <button class="status-btn ${os.status === 'in_field' ? 'active' : ''}" onclick="MinhasOS.updateStatus('in_field')">🚚 Em campo</button>
-          <button class="status-btn ${os.status === 'done' ? 'active' : ''}" onclick="MinhasOS.updateStatus('done')">✅ Concluído</button>
+      ${os.status !== 'done' ? `
+        <div class="detail-section">
+          <div class="detail-label">Atualizar Status</div>
+          <div class="status-buttons">
+            <button class="status-btn ${os.status === 'in_production' ? 'active' : ''}" onclick="MinhasOS.updateStatus('in_production')">🏭 Em produção</button>
+            <button class="status-btn ${os.status === 'in_field' ? 'active' : ''}" onclick="MinhasOS.updateStatus('in_field')">🚚 Em campo</button>
+          </div>
+          <button class="btn-finish" onclick="MinhasOS.finishAndNotify()">
+            ✅ Terminei — Avisar Chefe
+          </button>
         </div>
-      </div>
+      ` : `
+        <div class="detail-section">
+          <div class="info-banner" style="background: #06d6a015; border-color: #06d6a040; color: var(--secondary);">
+            ✅ <strong>Serviço concluído!</strong> O chefe já foi notificado.
+          </div>
+        </div>
+      `}
 
       <div class="detail-section">
         <div class="detail-label">✂️ Cortes de Alumínio</div>
@@ -178,43 +188,80 @@ const MinhasOS = {
     `;
   },
 
+  async finishAndNotify() {
+    if (!this.currentOS) return;
+    
+    if (!await Utils.confirm('Marcar como concluído e avisar o chefe?')) return;
+    
+    await this.updateStatus('done');
+    
+    setTimeout(() => {
+      Utils.toast('✅ Chefe avisado! Bom trabalho! 💪', 'success');
+    }, 800);
+  },
+
   async updateStatus(newStatus) {
     if (!this.currentOS) return;
 
-    const { error } = await sb
-      .from('service_orders')
-      .update({ status: newStatus })
-      .eq('id', this.currentOS.id);
+    const btn = event?.target;
+    if (btn) { btn.disabled = true; btn.textContent = 'Salvando...'; }
 
-    if (error) { Utils.toast('Erro: ' + error.message, 'error'); return; }
+    try {
+      const { error } = await sb
+        .from('service_orders')
+        .update({ status: newStatus })
+        .eq('id', this.currentOS.id);
 
-    Utils.toast(`Status: ${Utils.statusLabel(newStatus)}`);
-    
-    // NOTIFICAÇÃO PRO CHEFE
-    if (newStatus === 'done') {
-      await Notifications.create({
-        recipientRole: 'admin',
-        type: 'os_completed',
-        title: `OS ${this.currentOS.os_number} concluída!`,
-        message: `${APP_STATE.profile.name} marcou como concluído: ${this.currentOS.title}`,
-        relatedId: this.currentOS.id,
-        relatedType: 'service_order'
-      });
-    } else if (newStatus === 'in_field') {
-      await Notifications.create({
-        recipientRole: 'admin',
-        type: 'os_started',
-        title: `OS ${this.currentOS.os_number} em campo`,
-        message: `${APP_STATE.profile.name} saiu pra fazer: ${this.currentOS.title}`,
-        relatedId: this.currentOS.id,
-        relatedType: 'service_order'
-      });
+      if (error) {
+        console.error('Erro ao atualizar status:', error);
+        Utils.toast('Erro: ' + (error.message || 'Não foi possível atualizar'), 'error');
+        return;
+      }
+
+      Utils.toast(`✅ ${Utils.statusLabel(newStatus)}`);
+      
+      // NOTIFICAÇÃO PRO CHEFE (não bloqueia se der erro)
+      try {
+        if (newStatus === 'done') {
+          await Notifications.create({
+            recipientRole: 'admin',
+            type: 'os_completed',
+            title: `OS ${this.currentOS.os_number} concluída!`,
+            message: `${APP_STATE.profile.name} marcou como concluído: ${this.currentOS.title}`,
+            relatedId: this.currentOS.id,
+            relatedType: 'service_order'
+          });
+        } else if (newStatus === 'in_field') {
+          await Notifications.create({
+            recipientRole: 'admin',
+            type: 'os_started',
+            title: `OS ${this.currentOS.os_number} em campo`,
+            message: `${APP_STATE.profile.name} saiu pra fazer: ${this.currentOS.title}`,
+            relatedId: this.currentOS.id,
+            relatedType: 'service_order'
+          });
+        } else if (newStatus === 'in_production') {
+          await Notifications.create({
+            recipientRole: 'admin',
+            type: 'os_production',
+            title: `OS ${this.currentOS.os_number} em produção`,
+            message: `${APP_STATE.profile.name} começou: ${this.currentOS.title}`,
+            relatedId: this.currentOS.id,
+            relatedType: 'service_order'
+          });
+        }
+      } catch (notifErr) {
+        console.warn('Notificação não foi criada:', notifErr);
+      }
+
+      this.currentOS.status = newStatus;
+      this.renderDetail();
+      await Cortes.loadForOS(this.currentOS.id);
+      await this.list();
+    } catch (err) {
+      console.error(err);
+      Utils.toast('Erro inesperado: ' + err.message, 'error');
     }
-
-    this.currentOS.status = newStatus;
-    this.renderDetail();
-    await Cortes.loadForOS(this.currentOS.id);
-    await this.list();
   },
 
   async uploadPhoto(event) {
@@ -403,7 +450,7 @@ const MinhasOS = {
         relatedType: 'quote'
       });
 
-      Utils.toast('✅ Orçamento enviado pro chefe!');
+      Utils.toast('✅ Orçamento enviado pro chefe! Ele vai revisar e te avisar.', 'success');
       Utils.closeModal('quickQuoteModal');
       this.openDetail(this.currentOS.id);
     } catch (err) {

@@ -283,7 +283,7 @@ const Orcamentos = {
         relatedType: 'quote'
       });
 
-      Utils.toast('✅ Orçamento enviado pro chefe!');
+      Utils.toast('✅ Orçamento enviado pro chefe! Ele vai revisar e te avisar.', 'success');
       Utils.closeModal('workerOrcModal');
       await this.listWorker();
 
