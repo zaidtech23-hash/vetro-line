@@ -271,13 +271,20 @@
     <div class="screen-title"><h2>Funcionários</h2><p>EQUIPE DA VIDRAÇARIA</p></div>
     <div class="screen-toolbar">
       <div></div>
-      <button class="btn-action" onclick="Funcionarios.showInviteInfo()">➕ Adicionar Funcionário</button>
+      <button class="btn-action" onclick="Funcionarios.openNew()">➕ Adicionar Funcionário</button>
     </div>
-    <div class="table-wrapper">
+    
+    <!-- Versão tabela (desktop) -->
+    <div class="table-wrapper desktop-only">
       <table class="data-table">
-        <thead><tr><th>Nome</th><th>Telefone</th><th>Cargo</th><th>Status</th><th>Cadastrado</th></tr></thead>
-        <tbody id="funcTableBody"><tr><td colspan="5" class="loading">Carregando...</td></tr></tbody>
+        <thead><tr><th>Nome</th><th>Telefone</th><th>Cargo</th><th>Status</th><th>Cadastrado</th><th>Ações</th></tr></thead>
+        <tbody id="funcTableBody"><tr><td colspan="6" class="loading">Carregando...</td></tr></tbody>
       </table>
+    </div>
+    
+    <!-- Versão cards (mobile) -->
+    <div class="func-mobile-list mobile-only" id="funcCardsList">
+      <div class="loading">Carregando...</div>
     </div>
   </div>
 
@@ -630,6 +637,54 @@
     <div class="modal-footer">
       <button class="btn-secondary" onclick="Utils.closeModal('finModal')">Cancelar</button>
       <button class="btn-primary" style="width: auto; padding: 10px 24px;" onclick="Financeiro.save()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Cadastrar/Editar Funcionário -->
+<div class="modal-overlay" id="funcModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="funcModalTitle">👷 Novo Funcionário</div>
+      <button class="modal-close" onclick="Utils.closeModal('funcModal')">×</button>
+    </div>
+    <div class="modal-body" id="funcForm">
+      <div class="form-group">
+        <label class="form-label">Nome completo *</label>
+        <input class="form-input" id="func_name" placeholder="Ex: João Silva">
+      </div>
+      
+      <!-- Campos só pra cadastro novo (escondidos na edição) -->
+      <div id="funcAuthFields">
+        <div class="form-group">
+          <label class="form-label">Email *</label>
+          <input class="form-input" id="func_email" type="email" placeholder="joao@email.com">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Senha * (mínimo 6 caracteres)</label>
+          <input class="form-input" id="func_password" type="text" placeholder="123456">
+          <small style="color: var(--text-muted); font-size: 0.7rem;">⚠️ Anota essa senha pra passar pro funcionário!</small>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Telefone</label>
+        <input class="form-input" id="func_phone" placeholder="(00) 00000-0000">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Cargo *</label>
+        <select class="form-select" id="func_role">
+          <option value="worker">👷 Funcionário (vê só as OS dele)</option>
+          <option value="manager">👔 Gerente (vê tudo, pode editar)</option>
+          <option value="admin">👑 Administrador (acesso total)</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="Utils.closeModal('funcModal')">Cancelar</button>
+      <button class="btn-primary" id="funcSaveBtn" style="width: auto; padding: 10px 24px;" onclick="Funcionarios.save()">💾 Salvar</button>
     </div>
   </div>
 </div>

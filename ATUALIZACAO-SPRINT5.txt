@@ -1,0 +1,95 @@
+═══════════════════════════════════════════════════════════════
+  VetroLine — ATUALIZAÇÃO Sprint 5 (Bug fixes + Cadastro Auto)
+═══════════════════════════════════════════════════════════════
+
+OPA ELIAB! Vamos arrumar os bugs e adicionar cadastro automático!
+
+NOVIDADES:
+─────────
+✅ Bug do menu lateral no celular ARRUMADO
+✅ Botão "Sair" sempre visível na sidebar
+✅ Cadastro automático de funcionário (SEM precisar SQL!)
+
+
+═══════════════════════════════════════════════════════════════
+INSTALAÇÃO (3 PASSOS):
+═══════════════════════════════════════════════════════════════
+
+⚠️ NÃO PRECISA RODAR SQL DESSA VEZ! 
+   Só precisa configurar 1 coisinha no Supabase (passo 1).
+
+
+PASSO 1 — CONFIGURAR SUPABASE (IMPORTANTE!)
+─────────────────────────────────────────────
+Pra cadastro automático funcionar, tem que DESATIVAR a 
+confirmação por email (senão o funcionário precisa clicar 
+no link do email pra logar).
+
+1. Abre o Supabase
+2. Menu da esquerda → Authentication → Providers
+3. Clica em "Email"
+4. Procura "Confirm email" e DESLIGA (deixa OFF)
+5. Salva
+
+(Em produção tu pode ligar isso de novo, mas pra testar fica 
+mais fácil sem confirmação)
+
+
+PASSO 2 — SUBIR A NOVA VERSÃO
+─────────────────────────────
+A) PARA TESTAR LOCAL:
+   1. Apaga pasta vetroline antiga
+   2. Extrai vetroline-sprint5.zip
+   3. Renomeia "vetroline-v5" pra "vetroline"
+   4. Open with Live Server
+
+B) PARA ATUALIZAR NO GITHUB:
+   1. Vai no GitHub → teu repositório vetro-line
+   2. Clica em "Add file" → "Upload files"
+   3. Arrasta TODOS arquivos de dentro da pasta vetroline-v5
+   4. Confirma "Replace existing files" se aparecer
+   5. Commit changes
+   
+   Em 30 segundos tá no ar a versão atualizada!
+
+
+PASSO 3 — TESTAR
+────────────────
+1. Loga como admin
+2. Vai em "👷 Funcionários"
+3. Clica em "➕ Adicionar Funcionário"
+4. Preenche:
+   - Nome: João Teste
+   - Email: joao@teste.com
+   - Senha: 123456
+   - Cargo: Funcionário
+5. Salva
+6. Pronto! Aparece na lista
+7. Sai do sistema
+8. Loga com joao@teste.com / 123456
+9. Funciona direto!
+
+
+COMO FUNCIONA NO MENU LATERAL DO CELULAR:
+──────────────────────────────────────────
+- Aperta o ☰ no canto esquerdo
+- Menu desliza pela esquerda
+- Cobre 88% da tela
+- Aperta fora do menu pra fechar
+- Ou clica no X
+- Ou clica em qualquer item
+
+
+SE DER ERRO AO CADASTRAR FUNCIONÁRIO:
+──────────────────────────────────────
+Erro: "Email rate limit exceeded"
+→ Espera 1 minuto e tenta de novo (Supabase free tem limite)
+
+Erro: "User already registered"
+→ Esse email já tem conta. Usa outro.
+
+Erro: "Email not confirmed"
+→ Tu não desativou "Confirm email" no Supabase. Volta no PASSO 1.
+
+
+🔥 BORA TESTAR!

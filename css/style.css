@@ -1134,3 +1134,165 @@ body {
   .sidebar-item { padding: 14px 20px; }
   .nav-tab, .calendar-day { min-height: 44px; }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   FIX MOBILE — Sprint 5
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Sidebar mobile bug fix */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 88% !important;
+    max-width: 320px !important;
+    left: -100% !important;
+    border-right: none;
+  }
+  .sidebar.active {
+    left: 0 !important;
+  }
+  
+  .sidebar-overlay {
+    display: none;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.7);
+    z-index: 998;
+  }
+  .sidebar-overlay.active {
+    display: block !important;
+  }
+  
+  /* Garante que sidebar fique acima de tudo */
+  .sidebar {
+    z-index: 999 !important;
+  }
+  
+  /* Footer da sidebar visível */
+  .sidebar-foot {
+    padding: 16px;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  
+  .sidebar-nav {
+    padding-bottom: 80px;
+  }
+}
+
+/* Botão sair sempre visível */
+.sidebar-logout {
+  width: 100%;
+  padding: 14px;
+  background: #ef476f15;
+  border: 1px solid #ef476f30;
+  border-radius: 8px;
+  color: var(--danger);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.sidebar-logout:hover {
+  background: #ef476f25;
+  border-color: var(--danger);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   FUNCIONÁRIOS — RESPONSIVO (Sprint 6)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Por padrão: desktop mostra tabela, mobile mostra cards */
+.desktop-only { display: block; }
+.mobile-only { display: none; }
+
+@media (max-width: 768px) {
+  .desktop-only { display: none !important; }
+  .mobile-only { display: block !important; }
+}
+
+/* Lista de cards mobile */
+.func-mobile-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.func-mobile-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.func-mobile-card.blocked {
+  opacity: 0.6;
+  border-color: #ef476f30;
+}
+
+.func-mobile-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.func-mobile-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.func-mobile-role {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.func-mobile-info {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+
+.func-mobile-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.func-mobile-actions .btn-secondary {
+  padding: 10px 6px;
+  font-size: 0.7rem;
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .func-mobile-actions {
+    grid-template-columns: 1fr 1fr;
+  }
+  .func-mobile-actions .btn-secondary:nth-child(3) {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Linha bloqueada na tabela */
+.row-blocked {
+  opacity: 0.5;
+}
+
