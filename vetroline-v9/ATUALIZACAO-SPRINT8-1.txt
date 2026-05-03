@@ -1,0 +1,34 @@
+═══════════════════════════════════════════════════════════════
+  VetroLine — Sprint 8.1 — BUGS DO ORÇAMENTO RÁPIDO
+═══════════════════════════════════════════════════════════════
+
+ARRUMEI MANO:
+
+✅ BUG: "violates check constraint quotes_status_check"
+   → Banco arrumado (já tá ATIVO no Supabase, não precisa nada)
+
+✅ BUG: Botão Cancelar não pegava no orçamento rápido
+   → Agora os 2 botões (Cancelar + Enviar pro Chefe) estão lado a lado
+   → Cancelar 1/3 da tela, Enviar 2/3
+   → Dedo grande pega fácil
+
+✅ BUG: Salvar cliente não funcionava (do print anterior)
+   → Banco já arrumado anteriormente
+
+
+═══════════════════════════════════════════════════════════════
+PASSO ÚNICO — SUBIR NO GITHUB
+═══════════════════════════════════════════════════════════════
+
+1. Apaga pasta vetroline antiga
+2. Extrai vetroline-sprint8-1.zip
+3. Renomeia "vetroline-v7" pra "vetroline"
+4. GitHub → Add file → Upload files → arrasta tudo
+5. Commit changes
+6. Vercel atualiza AUTOMÁTICO em segundos!
+
+
+📱 NO CELULAR: LIMPA O CACHE!
+
+
+🔥 BORA TESTAR!

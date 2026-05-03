@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VetroLine — Sistema de Gestão</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     LOGIN
+     ═══════════════════════════════════════════════════════════════ -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <div class="logo">VetroLine</div>
+    <div class="subtitle">SISTEMA DE GESTÃO DE ESQUADRIAS</div>
+    <div class="form-group">
+      <label class="form-label">E-mail</label>
+      <input class="form-input" id="email" type="email" placeholder="seu@email.com" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Senha</label>
+      <input class="form-input" id="password" type="password" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="btn-primary" id="btnLogin" onclick="App.login()">Entrar no Sistema →</button>
+    <div class="message" id="message"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     APP (depois do login)
+     ═══════════════════════════════════════════════════════════════ -->
+<div id="appContainer" class="app-container">
+
+  <!-- TOP BAR (só logo + menu hamburger) -->
+  <nav class="top-bar">
+    <button class="menu-toggle" onclick="App.toggleSidebar()">☰</button>
+    <div class="top-logo">VetroLine</div>
+    <div class="top-user">
+      <button class="notif-bell" id="notifBell" onclick="Notifications.openPanel()">
+        🔔
+        <span class="notif-badge" id="notifBadge">0</span>
+      </button>
+      <div class="top-user-info">
+        <div class="top-user-name" id="topUserName">—</div>
+        <div class="top-user-org" id="topUserOrg">—</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- OVERLAY (escurece atrás da gaveta) -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="App.closeSidebar()"></div>
+
+  <!-- SIDEBAR (gaveta lateral) -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <div class="sidebar-logo">VetroLine</div>
+      <button class="sidebar-close" onclick="App.closeSidebar()">×</button>
+    </div>
+    <div class="sidebar-nav">
+      <div class="sidebar-section">Principal</div>
+      <div class="sidebar-item active" data-screen="dashboard" onclick="App.showScreen('dashboard')">
+        <span class="sidebar-icon">🏠</span> Dashboard
+      </div>
+      <div class="sidebar-item" data-screen="minhas-os" onclick="App.showScreen('minhas-os')">
+        <span class="sidebar-icon">📱</span> Minhas OS
+      </div>
+      <div class="sidebar-item" data-screen="agenda" onclick="App.showScreen('agenda')">
+        <span class="sidebar-icon">📅</span> Agenda
+      </div>
+
+      <div class="sidebar-section">Operação</div>
+      <div class="sidebar-item" data-screen="ordens" onclick="App.showScreen('ordens')">
+        <span class="sidebar-icon">📋</span> Ordens de Serviço
+      </div>
+      <div class="sidebar-item" data-screen="orcamentos" onclick="App.showScreen('orcamentos')">
+        <span class="sidebar-icon">⚡</span> Orçamentos
+      </div>
+      <div class="sidebar-item" data-screen="estoque" onclick="App.showScreen('estoque')">
+        <span class="sidebar-icon">📦</span> Estoque
+      </div>
+
+      <div class="sidebar-section">Cadastros</div>
+      <div class="sidebar-item" data-screen="clientes" onclick="App.showScreen('clientes')">
+        <span class="sidebar-icon">👥</span> Clientes
+      </div>
+      <div class="sidebar-item" data-screen="produtos" onclick="App.showScreen('produtos')">
+        <span class="sidebar-icon">🏷️</span> Produtos
+      </div>
+      <div class="sidebar-item" data-screen="funcionarios" onclick="App.showScreen('funcionarios')">
+        <span class="sidebar-icon">👷</span> Funcionários
+      </div>
+
+      <div class="sidebar-section">Gestão</div>
+      <div class="sidebar-item" data-screen="financeiro" onclick="App.showScreen('financeiro')">
+        <span class="sidebar-icon">💰</span> Financeiro
+      </div>
+      <div class="sidebar-item" data-screen="configuracoes" onclick="App.showScreen('configuracoes')">
+        <span class="sidebar-icon">⚙️</span> Configurações
+      </div>
+    </div>
+    <div class="sidebar-foot">
+      <button class="sidebar-logout" onclick="App.logout()">🚪 Sair do Sistema</button>
+    </div>
+  </aside>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       DASHBOARD
+       ═══════════════════════════════════════════════════════════ -->
+  <div id="screen-dashboard" class="screen active">
+    <div class="greeting-bar">
+      <div>
+        <div class="greeting-text">Olá, <span id="greetingName">—</span> 👋</div>
+        <div class="greeting-date" id="greetingDate">—</div>
+      </div>
+      <button class="btn-action" onclick="App.showScreen('ordens')">➕ Nova Ordem</button>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-icon">📋</div><div><div class="stat-value" id="statToday">—</div><div class="stat-label">Serviços hoje</div></div></div>
+      <div class="stat-card"><div class="stat-icon">✅</div><div><div class="stat-value" id="statDone">—</div><div class="stat-label">Concluídos</div></div></div>
+      <div class="stat-card"><div class="stat-icon">💰</div><div><div class="stat-value" id="statIncome">—</div><div class="stat-label">Faturado no mês</div></div></div>
+      <div class="stat-card"><div class="stat-icon">⚠️</div><div><div class="stat-value" id="statAlerts">—</div><div class="stat-label">Estoque baixo</div></div></div>
+    </div>
+    <div class="two-cols">
+      <div class="panel">
+        <div class="panel-head"><div class="panel-title">📋 Próximos Serviços</div><div class="panel-action" onclick="App.showScreen('ordens')">Ver todos →</div></div>
+        <div class="panel-body" id="todayOrdersList"><div class="loading">Carregando...</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div class="panel-title">👷 Funcionários</div><div class="panel-action" onclick="App.showScreen('funcionarios')">Gerenciar →</div></div>
+        <div class="panel-body" id="workersList"><div class="loading">Carregando...</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       AGENDA
+       ═══════════════════════════════════════════════════════════ -->
+  <div id="screen-agenda" class="screen">
+    <div class="screen-title"><h2>Agenda</h2><p>CALENDÁRIO DE SERVIÇOS</p></div>
+    
+    <div class="calendar-wrap">
+      <div class="calendar-head">
+        <div class="calendar-title" id="calendarTitle">—</div>
+        <div class="calendar-nav">
+          <button class="btn-secondary" onclick="Agenda.prevMonth()">←</button>
+          <button class="btn-secondary" onclick="Agenda.goToToday()">Hoje</button>
+          <button class="btn-secondary" onclick="Agenda.nextMonth()">→</button>
+        </div>
+      </div>
+      <div class="calendar-grid" id="calendarGrid"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">📋 Próximos Serviços</div>
+      </div>
+      <div class="panel-body" id="upcomingEvents"><div class="loading">Carregando...</div></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       MINHAS OS (funcionário)
+       ═══════════════════════════════════════════════════════════ -->
+  <div id="screen-minhas-os" class="screen">
+    <div class="screen-title"><h2>Minhas Ordens de Serviço</h2><p>SERVIÇOS ATRIBUÍDOS A VOCÊ</p></div>
+    <div class="os-mobile-list" id="minhasOSList"><div class="loading">Carregando...</div></div>
+  </div>
+
+  <!-- ORDENS -->
+  <div id="screen-ordens" class="screen">
+    <div class="screen-title"><h2>Ordens de Serviço</h2><p>GESTÃO COMPLETA</p></div>
+    <div class="screen-toolbar">
+      <div></div>
+      <button class="btn-action" onclick="Ordens.openNew()">➕ Nova Ordem</button>
+    </div>
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead><tr><th>Número</th><th>Título</th><th>Cliente</th><th>Funcionário</th><th>Vencimento</th><th>Status</th><th class="text-right">Total</th><th>Ações</th></tr></thead>
+        <tbody id="osTableBody"><tr><td colspan="8" class="loading">Carregando...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ORÇAMENTOS -->
+  <div id="screen-orcamentos" class="screen">
+    <div class="screen-title"><h2>Orçamentos</h2><p>ORÇAMENTOS PROFISSIONAIS</p></div>
+    <div class="screen-toolbar">
+      <div></div>
+      <button class="btn-action" onclick="Orcamentos.openNew()">➕ Novo Orçamento</button>
+    </div>
+    
+    <!-- Tabela (desktop) -->
+    <div class="table-wrapper desktop-only">
+      <table class="data-table">
+        <thead><tr><th>Número</th><th>Cliente</th><th>Criado</th><th>Validade</th><th>Status</th><th class="text-right">Total</th><th>Ações</th></tr></thead>
+        <tbody id="orcTableBody"><tr><td colspan="7" class="loading">Carregando...</td></tr></tbody>
+      </table>
+    </div>
+    
+    <!-- Cards (mobile) -->
+    <div class="orc-cards-list mobile-only" id="orcCardsList">
+      <div class="loading">Carregando...</div>
+    </div>
+  </div>
+
+  <!-- CLIENTES -->
+  <div id="screen-clientes" class="screen">
+    <div class="screen-title"><h2>Clientes</h2><p>BASE DE CLIENTES</p></div>
+    <div class="screen-toolbar">
+      <div></div>
+      <button class="btn-action" onclick="Clientes.openNew()">➕ Novo Cliente</button>
+    </div>
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead><tr><th>Nome</th><th>Telefone</th><th>E-mail</th><th>CPF/CNPJ</th><th>Cidade</th><th>Ações</th></tr></thead>
+        <tbody id="clientsTableBody"><tr><td colspan="6" class="loading">Carregando...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PRODUTOS -->
+  <div id="screen-produtos" class="screen">
+    <div class="screen-title"><h2>Produtos / Serviços</h2><p>PRODUTOS QUE VOCÊ OFERECE</p></div>
+    <div class="screen-toolbar">
+      <div></div>
+      <button class="btn-action" onclick="Produtos.openNew()">➕ Novo Produto</button>
+    </div>
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead><tr><th>Nome</th><th>Categoria</th><th>Preço</th><th>Custo</th><th>Ações</th></tr></thead>
+        <tbody id="produtosTableBody"><tr><td colspan="5" class="loading">Carregando...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ESTOQUE -->
+  <div id="screen-estoque" class="screen">
+    <div class="screen-title"><h2>Estoque</h2><p>ALUMÍNIO · VIDROS · FERRAGENS</p></div>
+    <div class="screen-toolbar">
+      <div></div>
+      <div class="flex gap-12">
+        <button class="btn-action" id="btnEntradaEstoque" onclick="Estoque.openEntry()" style="display: none;">📦 Adicionar Entrada</button>
+        <button class="btn-action" id="btnNovoItem" onclick="Estoque.openNew()">➕ Novo Item</button>
+      </div>
+    </div>
+    
+    <!-- Tabela (desktop) -->
+    <div class="table-wrapper desktop-only">
+      <table class="data-table">
+        <thead><tr><th>Código</th><th>Nome</th><th>Categoria</th><th>Quantidade</th><th>Mínimo</th><th>Custo</th><th>Status</th><th>Ações</th></tr></thead>
+        <tbody id="estoqueTableBody"><tr><td colspan="8" class="loading">Carregando...</td></tr></tbody>
+      </table>
+    </div>
+    
+    <!-- Cards (mobile) -->
+    <div class="estoque-cards-list mobile-only" id="estoqueCardsList">
+      <div class="loading">Carregando...</div>
+    </div>
+  </div>
+
+  <!-- FINANCEIRO -->
+  <div id="screen-financeiro" class="screen">
+    <div class="screen-title"><h2>Financeiro</h2><p>ENTRADAS · SAÍDAS · SALDO</p></div>
+    <div class="fin-grid">
+      <div class="fin-card income"><div class="fin-title">💰 Entradas do mês</div><div class="fin-value income" id="finIncome">—</div></div>
+      <div class="fin-card expense"><div class="fin-title">💸 Saídas do mês</div><div class="fin-value expense" id="finExpense">—</div></div>
+      <div class="fin-card balance"><div class="fin-title">💵 Saldo do mês</div><div class="fin-value balance" id="finBalance">—</div></div>
+    </div>
+    <div class="screen-toolbar">
+      <div></div>
+      <div class="flex gap-12">
+        <button class="btn-secondary" onclick="Financeiro.openNew('income')" style="border-color: #06d6a030; color: var(--secondary);">➕ Entrada</button>
+        <button class="btn-secondary" onclick="Financeiro.openNew('expense')" style="border-color: #ef476f30; color: var(--danger);">➖ Saída</button>
+      </div>
+    </div>
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead><tr><th>Data</th><th>Tipo</th><th>Categoria</th><th>Descrição</th><th class="text-right">Valor</th><th>Ações</th></tr></thead>
+        <tbody id="finTableBody"><tr><td colspan="6" class="loading">Carregando...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- FUNCIONÁRIOS -->
+  <div id="screen-funcionarios" class="screen">
+    <div class="screen-title"><h2>Funcionários</h2><p>EQUIPE DA VIDRAÇARIA</p></div>
+    <div class="screen-toolbar">
+      <div></div>
+      <button class="btn-action" onclick="Funcionarios.openNew()">➕ Adicionar Funcionário</button>
+    </div>
+    
+    <!-- Versão tabela (desktop) -->
+    <div class="table-wrapper desktop-only">
+      <table class="data-table">
+        <thead><tr><th>Nome</th><th>Telefone</th><th>Cargo</th><th>Status</th><th>Cadastrado</th><th>Ações</th></tr></thead>
+        <tbody id="funcTableBody"><tr><td colspan="6" class="loading">Carregando...</td></tr></tbody>
+      </table>
+    </div>
+    
+    <!-- Versão cards (mobile) -->
+    <div class="func-mobile-list mobile-only" id="funcCardsList">
+      <div class="loading">Carregando...</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       CONFIGURAÇÕES
+       ═══════════════════════════════════════════════════════════ -->
+  <div id="screen-configuracoes" class="screen">
+    <div class="screen-title"><h2>Configurações</h2><p>PREÇOS E PARÂMETROS DA VIDRAÇARIA</p></div>
+
+    <div class="config-section">
+      <div class="config-section-title">🪟 PREÇO DO ALUMÍNIO (por metro)</div>
+      <div class="form-row">
+        <div><label class="form-label">Branco (R$/m)</label><input class="form-input" id="cfg_aluminio_branco_metro" type="number" step="0.01"></div>
+        <div><label class="form-label">Preto (R$/m)</label><input class="form-input" id="cfg_aluminio_preto_metro" type="number" step="0.01"></div>
+        <div><label class="form-label">Bronze (R$/m)</label><input class="form-input" id="cfg_aluminio_bronze_metro" type="number" step="0.01"></div>
+        <div><label class="form-label">Fosco (R$/m)</label><input class="form-input" id="cfg_aluminio_fosco_metro" type="number" step="0.01"></div>
+      </div>
+    </div>
+
+    <div class="config-section">
+      <div class="config-section-title">⚖️ PESO DA BARRA</div>
+      <div class="form-row">
+        <div><label class="form-label">Barra 6m (R$)</label><input class="form-input" id="cfg_peso_barra_6m" type="number" step="0.01" placeholder="Ex: 49.50"></div>
+        <div><label class="form-label">Barra 3m (R$)</label><input class="form-input" id="cfg_peso_barra_3m" type="number" step="0.01"></div>
+      </div>
+    </div>
+
+    <div class="config-section">
+      <div class="config-section-title">💰 PREÇO DOS SERVIÇOS</div>
+      <div class="form-row">
+        <div><label class="form-label">Janela (R$)</label><input class="form-input" id="cfg_preco_janela" type="number" step="0.01"></div>
+        <div><label class="form-label">Porta (R$)</label><input class="form-input" id="cfg_preco_porta" type="number" step="0.01"></div>
+        <div><label class="form-label">Box (R$)</label><input class="form-input" id="cfg_preco_box" type="number" step="0.01"></div>
+      </div>
+      <div class="form-row">
+        <div><label class="form-label">Espelho comum (R$)</label><input class="form-input" id="cfg_preco_espelho" type="number" step="0.01"></div>
+        <div><label class="form-label">Espelho com LED (R$)</label><input class="form-input" id="cfg_preco_espelho_led" type="number" step="0.01"></div>
+        <div><label class="form-label">Vitrine (R$)</label><input class="form-input" id="cfg_preco_vitrine" type="number" step="0.01"></div>
+      </div>
+      <div class="form-row">
+        <div><label class="form-label">Porta de Correr (R$)</label><input class="form-input" id="cfg_preco_porta_correr" type="number" step="0.01"></div>
+        <div><label class="form-label">Mão de Obra (R$/h)</label><input class="form-input" id="cfg_preco_mao_obra_hora" type="number" step="0.01"></div>
+      </div>
+    </div>
+
+    <div class="config-section">
+      <div class="config-section-title">📋 OUTRAS INFORMAÇÕES</div>
+      <div class="form-group"><label class="form-label">Fornecedor principal</label><input class="form-input" id="cfg_fornecedor_principal" placeholder="Ex: Alcoa, CBA..."></div>
+      <div class="form-group"><label class="form-label">Observações</label><textarea class="form-textarea" id="cfg_observacoes" placeholder="Notas internas, lembretes..."></textarea></div>
+    </div>
+
+    <button class="btn-primary" onclick="Configuracoes.save()" style="width: 100%; max-width: 400px; margin: 20px auto; display: block;">💾 Salvar Configurações</button>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     MODAIS
+     ═══════════════════════════════════════════════════════════════ -->
+
+<!-- Modal Detalhe da OS (funcionário) -->
+<div class="modal-overlay" id="osDetailModal">
+  <div class="modal large">
+    <div class="modal-head">
+      <div class="modal-title" id="osDetailTitle">Detalhes da OS</div>
+      <button class="modal-close" onclick="Utils.closeModal('osDetailModal')">×</button>
+    </div>
+    <div class="modal-body" id="osDetailBody"></div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="Utils.closeModal('osDetailModal'); MinhasOS.list();">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Cortes (admin gerenciador) -->
+<div class="modal-overlay" id="cutsManagerModal">
+  <div class="modal large">
+    <div class="modal-head">
+      <div class="modal-title" id="cutsManagerTitle">✂️ Cortes</div>
+      <button class="modal-close" onclick="Utils.closeModal('cutsManagerModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom: 16px;">
+        <button class="btn-action" onclick="Cortes.openNew()">➕ Adicionar Corte</button>
+      </div>
+      <div id="cutsList"><div class="loading">Carregando...</div></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" style="flex: 1;" onclick="Utils.closeModal('cutsManagerModal')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Adicionar/Editar Corte -->
+<div class="modal-overlay" id="cutModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="cutModalTitle">Novo Corte</div>
+      <button class="modal-close" onclick="Utils.closeModal('cutModal')">×</button>
+    </div>
+    <div class="modal-body" id="cutForm">
+      <div class="form-row">
+        <div><label class="form-label">Material *</label><input class="form-input" id="cut_material" placeholder="Ex: Perfil Suprema"></div>
+        <div><label class="form-label">Cor</label><input class="form-input" id="cut_cor" placeholder="Branco, Preto..."></div>
+      </div>
+      <div class="form-row">
+        <div><label class="form-label">Comprimento (m) *</label><input class="form-input" id="cut_comprimento" type="number" step="0.01" placeholder="2.50"></div>
+        <div><label class="form-label">Quantidade *</label><input class="form-input" id="cut_quantidade" type="number" min="1" value="1"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Observações</label><textarea class="form-textarea" id="cut_observacoes"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" style="flex: 1;" onclick="Utils.closeModal('cutModal')">Cancelar</button>
+      <button class="btn-primary" style="flex: 2;" onclick="Cortes.save()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Detalhe do Dia (Agenda) -->
+<div class="modal-overlay" id="dayDetailModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="dayDetailTitle">Dia</div>
+      <button class="modal-close" onclick="Utils.closeModal('dayDetailModal')">×</button>
+    </div>
+    <div class="modal-body" id="dayDetailBody"></div>
+    <div class="modal-footer">
+      <button class="btn-secondary" style="flex: 1;" onclick="Utils.closeModal('dayDetailModal')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Orçamento Rápido (funcionário no campo) -->
+<div class="modal-overlay" id="quickQuoteModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">⚡ Orçamento Rápido</div>
+      <button class="modal-close" onclick="Utils.closeModal('quickQuoteModal')">×</button>
+    </div>
+    <div class="modal-body" id="quickQuoteForm">
+      <p style="color: var(--text-dim); font-size: 0.85rem; margin-bottom: 16px;">
+        Preenche os dados que tu pegou na casa do cliente. Tira foto pra mostrar pro chefe! O chefe define o valor depois.
+      </p>
+      
+      <div class="config-section-title" style="margin-top: 0;">👤 DADOS DO CLIENTE</div>
+      <div class="form-group">
+        <label class="form-label">Nome do cliente *</label>
+        <input class="form-input" id="qq_client_name_input" placeholder="Ex: João Silva">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Telefone</label>
+        <input class="form-input" id="qq_client_phone" placeholder="(00) 00000-0000">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Endereço</label>
+        <input class="form-input" id="qq_client_address" placeholder="Rua, número, bairro, cidade">
+      </div>
+      
+      <div class="config-section-title" style="margin-top: 24px;">🔧 SERVIÇO</div>
+      <div class="form-group">
+        <label class="form-label">Tipo de serviço *</label>
+        <input class="form-input" id="qq_service_type" placeholder="Ex: Box vidro 8mm temperado">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Medidas</label>
+        <input class="form-input" id="qq_measurements" placeholder="Ex: 1,20m x 2,00m">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Observações detalhadas</label>
+        <textarea class="form-textarea" id="qq_notes" placeholder="Detalhes do serviço, dificuldades, prazo, tudo o que for importante..."></textarea>
+      </div>
+      
+      <div class="config-section-title" style="margin-top: 24px;">📸 FOTOS DO LUGAR</div>
+      <div class="photos-grid" id="qq_photos"></div>
+      <button type="button" class="upload-btn" onclick="Camera.open(MinhasOS.uploadQQPhoto.bind(MinhasOS))">
+        📷 Tirar Foto
+      </button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" style="flex: 1;" onclick="Utils.closeModal('quickQuoteModal')">Cancelar</button>
+      <button class="btn-primary" id="qqSaveBtn" style="flex: 2;" onclick="MinhasOS.saveQuickQuote()">💾 Enviar pro Chefe</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Cliente -->
+<div class="modal-overlay" id="clienteModal">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title" id="clienteModalTitle">Novo Cliente</div><button class="modal-close" onclick="Utils.closeModal('clienteModal')">×</button></div>
+    <div class="modal-body" id="clienteForm">
+      <div class="form-row">
+        <div><label class="form-label">Nome *</label><input class="form-input" id="cli_name"></div>
+        <div><label class="form-label">Telefone</label><input class="form-input" id="cli_phone"></div>
+      </div>
+      <div class="form-row">
+        <div><label class="form-label">E-mail</label><input class="form-input" id="cli_email" type="email"></div>
+        <div><label class="form-label">CPF/CNPJ</label><input class="form-input" id="cli_cpf"></div>
+      </div>
+      <div class="form-row"><div style="grid-column: 1 / -1;"><label class="form-label">Endereço</label><input class="form-input" id="cli_address"></div></div>
+      <div class="form-row"><div><label class="form-label">Cidade</label><input class="form-input" id="cli_city"></div></div>
+      <div class="form-group"><label class="form-label">Observações</label><textarea class="form-textarea" id="cli_notes"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" style="flex: 1;" onclick="Utils.closeModal('clienteModal')">Cancelar</button>
+      <button class="btn-primary" style="flex: 2;" onclick="Clientes.save()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal OS (admin) -->
+<div class="modal-overlay" id="osModal">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title" id="osModalTitle">Nova OS</div><button class="modal-close" onclick="Utils.closeModal('osModal')">×</button></div>
+    <div class="modal-body" id="osForm">
+      <div class="form-row">
+        <div><label class="form-label">Número OS</label><input class="form-input" id="os_number"></div>
+        <div><label class="form-label">Vencimento</label><input class="form-input" id="os_due_date" type="date"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Título *</label><input class="form-input" id="os_title"></div>
+      <div class="form-group"><label class="form-label">Descrição</label><textarea class="form-textarea" id="os_description"></textarea></div>
+      <div class="form-row">
+        <div><label class="form-label">Cliente</label><select class="form-select" id="os_client"></select></div>
+        <div><label class="form-label">Funcionário</label><select class="form-select" id="os_worker"></select></div>
+      </div>
+      <div class="form-row">
+        <div><label class="form-label">Status</label>
+          <select class="form-select" id="os_status">
+            <option value="pending">Pendente</option><option value="in_production">Em produção</option>
+            <option value="in_field">Em campo</option><option value="done">Concluído</option><option value="canceled">Cancelado</option>
+          </select>
+        </div>
+        <div><label class="form-label">Prioridade</label>
+          <select class="form-select" id="os_priority">
+            <option value="low">Baixa</option><option value="normal">Normal</option><option value="high">Alta</option><option value="urgent">Urgente</option>
+          </select>
+        </div>
+        <div><label class="form-label">Total (R$)</label><input class="form-input" id="os_total" type="number" step="0.01"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" style="flex: 1;" onclick="Utils.closeModal('osModal')">Cancelar</button>
+      <button class="btn-primary" style="flex: 2;" onclick="Ordens.save()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Orçamento (ADMIN) -->
+<div class="modal-overlay" id="orcModal">
+  <div class="modal large">
+    <div class="modal-head"><div class="modal-title" id="orcModalTitle">Novo Orçamento</div><button class="modal-close" onclick="Utils.closeModal('orcModal')">×</button></div>
+    <div class="modal-body" id="orcForm">
+      <!-- Banner mostrando dados que o funcionário enviou -->
+      <div id="orcTempClientInfo" style="display: none;"></div>
+      
+      <div class="form-row">
+        <div><label class="form-label">Número</label><input class="form-input" id="orc_number"></div>
+        <div><label class="form-label">Cliente cadastrado</label><select class="form-select" id="orc_client"></select></div>
+      </div>
+      <div class="form-row">
+        <div><label class="form-label">Subtotal</label><input class="form-input" id="orc_subtotal" type="number" step="0.01" oninput="Orcamentos.calculateTotal()"></div>
+        <div><label class="form-label">Mão obra</label><input class="form-input" id="orc_labor" type="number" step="0.01" oninput="Orcamentos.calculateTotal()"></div>
+        <div><label class="form-label">Desconto</label><input class="form-input" id="orc_discount" type="number" step="0.01" oninput="Orcamentos.calculateTotal()"></div>
+      </div>
+      <div class="form-row">
+        <div><label class="form-label">TOTAL</label><input class="form-input" id="orc_total" type="number" step="0.01" style="border-color: var(--primary); color: var(--primary); font-weight: 800;"></div>
+        <div><label class="form-label">Validade</label><input class="form-input" id="orc_valid_until" type="date"></div>
+      </div>
+      <div class="form-row">
+        <div><label class="form-label">Pagamento</label>
+          <select class="form-select" id="orc_payment">
+            <option value="">—</option><option value="pix">PIX</option><option value="dinheiro">Dinheiro</option>
+            <option value="boleto">Boleto</option><option value="cartao">Cartão</option><option value="parcelado">Parcelado</option>
+          </select>
+        </div>
+        <div><label class="form-label">Status</label>
+          <select class="form-select" id="orc_status">
+            <option value="draft">Rascunho</option>
+            <option value="pending_review">⏳ Pendente</option>
+            <option value="sent">Enviado</option>
+            <option value="accepted">✅ Aprovado</option>
+            <option value="rejected">❌ Rejeitado</option>
+            <option value="converted">Convertido em OS</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Observações</label><textarea class="form-textarea" id="orc_notes"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" style="flex: 1;" onclick="Utils.closeModal('orcModal')">Cancelar</button>
+      <button class="btn-primary" style="flex: 2;" onclick="Orcamentos.save()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Orçamento Rápido FUNCIONÁRIO (sem valores) -->
+<div class="modal-overlay" id="workerOrcModal">
+  <div class="modal large">
+    <div class="modal-head">
+      <div class="modal-title" id="workerOrcModalTitle">⚡ Novo Orçamento</div>
+      <button class="modal-close" onclick="Utils.closeModal('workerOrcModal')">×</button>
+    </div>
+    <div class="modal-body" id="workerOrcForm">
+      <p style="color: var(--text-dim); font-size: 0.85rem; margin-bottom: 16px;">
+        Preenche os dados que tu pegou na casa do cliente. Tira foto pra mostrar pro chefe!
+      </p>
+      
+      <div class="config-section-title" style="margin-top: 0;">👤 DADOS DO CLIENTE</div>
+      <div class="form-group">
+        <label class="form-label">Nome do cliente *</label>
+        <input class="form-input" id="worker_client_name" placeholder="Ex: João Silva">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Telefone</label>
+        <input class="form-input" id="worker_client_phone" placeholder="(00) 00000-0000">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Endereço</label>
+        <input class="form-input" id="worker_client_address" placeholder="Rua, número, bairro, cidade">
+      </div>
+      
+      <div class="config-section-title" style="margin-top: 24px;">🔧 SERVIÇO</div>
+      <div class="form-group">
+        <label class="form-label">Tipo de serviço *</label>
+        <input class="form-input" id="worker_service_type" placeholder="Ex: Box vidro 8mm temperado">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Medidas</label>
+        <input class="form-input" id="worker_measurements" placeholder="Ex: 1,20m x 2,00m">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Observações detalhadas</label>
+        <textarea class="form-textarea" id="worker_notes" placeholder="Detalhes do serviço, dificuldades, prazo, tudo o que for importante..."></textarea>
+      </div>
+      
+      <div class="config-section-title" style="margin-top: 24px;">📸 FOTOS DO LUGAR</div>
+      <div class="photos-grid" id="workerOrcPhotos"></div>
+      <button type="button" class="upload-btn" onclick="Camera.open(Orcamentos.uploadWorkerOrcPhoto.bind(Orcamentos))">
+        📷 Tirar Foto
+      </button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" style="flex: 1;" onclick="Utils.closeModal('workerOrcModal')">Cancelar</button>
+      <button class="btn-primary" id="workerOrcSaveBtn" style="flex: 2;" onclick="Orcamentos.saveWorker()">💾 Enviar pro Chefe</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Detalhe Orçamento FUNCIONÁRIO -->
+<div class="modal-overlay" id="workerOrcDetailModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">⚡ Detalhes do Orçamento</div>
+      <button class="modal-close" onclick="Utils.closeModal('workerOrcDetailModal')">×</button>
+    </div>
+    <div class="modal-body" id="workerOrcDetailBody"></div>
+    <div class="modal-footer">
+      <button class="btn-secondary" style="flex: 1;" onclick="Utils.closeModal('workerOrcDetailModal')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Entrada de Estoque -->
+<div class="modal-overlay" id="entryModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">📦 Adicionar Entrada</div>
+      <button class="modal-close" onclick="Utils.closeModal('entryModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="color: var(--text-dim); font-size: 0.85rem; margin-bottom: 16px;">
+        Procura o produto que chegou e adiciona a quantidade.
+      </p>
+      
+      <div class="form-group">
+        <label class="form-label">🔍 Buscar produto</label>
+        <input class="form-input" id="entry_search" placeholder="Digite nome, código ou categoria..." oninput="Estoque.searchProduct()">
+      </div>
+      
+      <div id="entry_results" class="search-results"></div>
+      
+      <div id="entry_notFound" style="display: none; padding: 16px; background: #ffd93d15; border: 1px solid #ffd93d30; border-radius: 8px; margin-bottom: 16px;">
+        <div style="color: var(--warning); font-weight: 700; margin-bottom: 8px;">⚠️ Produto não cadastrado!</div>
+        <div style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 12px;">
+          Esse produto não tá no sistema. Quer cadastrar agora?
+        </div>
+        <button class="btn-primary" style="width: 100%;" onclick="Estoque.openNewProduct()">➕ Cadastrar Produto Novo</button>
+      </div>
+      
+      <div id="entry_selected" style="display: none;">
+        <div class="info-banner" style="margin-bottom: 16px;">
+          <div style="font-weight: 800; margin-bottom: 4px;">📦 Produto selecionado:</div>
+          <div id="entry_selected_name" style="font-size: 1rem; color: var(--primary);"></div>
+          <div id="entry_selected_info" style="font-size: 0.8rem; color: var(--text-dim); margin-top: 4px;"></div>
+          <button class="btn-secondary" style="margin-top: 12px; width: 100%;" onclick="Estoque.clearSelected()">Trocar produto</button>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Quantidade que chegou *</label>
+          <input class="form-input" id="entry_quantity" type="number" step="0.01" placeholder="Ex: 10">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Observações</label>
+          <textarea class="form-textarea" id="entry_observations" placeholder="Ex: Alumínio chegou torto, vidro com risco..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" style="flex: 1;" onclick="Utils.closeModal('entryModal')">Cancelar</button>
+      <button class="btn-primary" id="entrySaveBtn" style="flex: 2;" onclick="Estoque.saveEntry()">💾 Salvar Entrada</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Estoque -->
+<div class="modal-overlay" id="estoqueModal">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title" id="estoqueModalTitle">Novo Item</div><button class="modal-close" onclick="Utils.closeModal('estoqueModal')">×</button></div>
+    <div class="modal-body" id="estoqueForm">
+      <div class="form-group">
+        <label class="form-label">Categoria *</label>
+        <select class="form-select" id="inv_category">
+          <option value="">— Escolha —</option>
+          <option value="esquadria">🪟 Esquadria</option>
+          <option value="vidro">🔷 Vidro</option>
+          <option value="ferragem">🔩 Ferragem</option>
+          <option value="acessorio">🔧 Acessório</option>
+          <option value="outro">📦 Outro</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Nome *</label><input class="form-input" id="inv_name" placeholder="Ex: Perfil 6m Linha Suprema"></div>
+      <div class="form-row">
+        <div><label class="form-label">Quantidade *</label><input class="form-input" id="inv_quantity" type="number" step="0.01" placeholder="Ex: 4"></div>
+        <div><label class="form-label">Mínimo *</label><input class="form-input" id="inv_min_quantity" type="number" step="0.01" placeholder="Ex: 2"></div>
+      </div>
+      <div class="form-row admin-only-field">
+        <div><label class="form-label">Custo (R$)</label><input class="form-input" id="inv_cost" type="number" step="0.01" placeholder="Ex: 49.50"></div>
+        <div><label class="form-label">Fornecedor</label><input class="form-input" id="inv_supplier" placeholder="Ex: Alcoa"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Observações</label><textarea class="form-textarea" id="inv_notes" placeholder="Ex: Algumas peças tortas..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" style="flex: 1;" onclick="Utils.closeModal('estoqueModal')">Cancelar</button>
+      <button class="btn-primary" style="flex: 2;" onclick="Estoque.save()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Produto -->
+<div class="modal-overlay" id="produtoModal">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title" id="produtoModalTitle">Novo Produto</div><button class="modal-close" onclick="Utils.closeModal('produtoModal')">×</button></div>
+    <div class="modal-body" id="produtoForm">
+      <div class="form-group"><label class="form-label">Nome *</label><input class="form-input" id="prod_name"></div>
+      <div class="form-group"><label class="form-label">Descrição</label><textarea class="form-textarea" id="prod_description"></textarea></div>
+      <div class="form-row">
+        <div><label class="form-label">Categoria</label><input class="form-input" id="prod_category" placeholder="janela, porta, box, espelho com LED..."></div>
+      </div>
+      <div class="form-row">
+        <div><label class="form-label">Preço de venda (R$)</label><input class="form-input" id="prod_price" type="number" step="0.01"></div>
+        <div><label class="form-label">Custo (R$)</label><input class="form-input" id="prod_cost" type="number" step="0.01"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" style="flex: 1;" onclick="Utils.closeModal('produtoModal')">Cancelar</button>
+      <button class="btn-primary" style="flex: 2;" onclick="Produtos.save()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Financeiro -->
+<div class="modal-overlay" id="finModal">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title" id="finModalTitle">Nova Transação</div><button class="modal-close" onclick="Utils.closeModal('finModal')">×</button></div>
+    <div class="modal-body" id="finForm">
+      <div class="form-row">
+        <div><label class="form-label">Tipo</label>
+          <select class="form-select" id="fin_type">
+            <option value="income">💰 Entrada</option><option value="expense">💸 Saída</option>
+          </select>
+        </div>
+        <div><label class="form-label">Data</label><input class="form-input" id="fin_date" type="date"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Descrição *</label><input class="form-input" id="fin_description"></div>
+      <div class="form-row">
+        <div><label class="form-label">Categoria</label><input class="form-input" id="fin_category"></div>
+        <div><label class="form-label">Valor (R$) *</label><input class="form-input" id="fin_amount" type="number" step="0.01"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" style="flex: 1;" onclick="Utils.closeModal('finModal')">Cancelar</button>
+      <button class="btn-primary" style="flex: 2;" onclick="Financeiro.save()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Cadastrar/Editar Funcionário -->
+<div class="modal-overlay" id="funcModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="funcModalTitle">👷 Novo Funcionário</div>
+      <button class="modal-close" onclick="Utils.closeModal('funcModal')">×</button>
+    </div>
+    <div class="modal-body" id="funcForm">
+      <div class="form-group">
+        <label class="form-label">Nome completo *</label>
+        <input class="form-input" id="func_name" placeholder="Ex: João Silva">
+      </div>
+      
+      <!-- Campos só pra cadastro novo (escondidos na edição) -->
+      <div id="funcAuthFields">
+        <div class="form-group">
+          <label class="form-label">Email *</label>
+          <input class="form-input" id="func_email" type="email" placeholder="joao@email.com">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Senha * (mínimo 6 caracteres)</label>
+          <input class="form-input" id="func_password" type="text" placeholder="123456">
+          <small style="color: var(--text-muted); font-size: 0.7rem;">⚠️ Anota essa senha pra passar pro funcionário!</small>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Telefone</label>
+        <input class="form-input" id="func_phone" placeholder="(00) 00000-0000">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Cargo *</label>
+        <select class="form-select" id="func_role">
+          <option value="worker">👷 Funcionário (vê só as OS dele)</option>
+          <option value="manager">👔 Gerente (vê tudo, pode editar)</option>
+          <option value="admin">👑 Administrador (acesso total)</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" style="flex: 1;" onclick="Utils.closeModal('funcModal')">Cancelar</button>
+      <button class="btn-primary" id="funcSaveBtn" style="flex: 2;" onclick="Funcionarios.save()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal ALERTA: Novo Serviço Atribuído (funcionário) -->
+<div class="modal-overlay" id="newOSAlertModal">
+  <div class="modal" style="border-top-color: var(--secondary); border-top-width: 4px;">
+    <div class="modal-body" style="text-align: center; padding: 32px 20px;">
+      <div style="font-size: 4rem; margin-bottom: 8px; animation: bounce 0.6s ease-in-out infinite alternate;">🆕</div>
+      <div id="newOSAlertTitle" style="font-family: 'Rajdhani', sans-serif; font-size: 1.6rem; font-weight: 700; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 12px; letter-spacing: 1px;">
+        🆕 Novo Serviço!
+      </div>
+      <div id="newOSAlertMsg" style="font-size: 0.95rem; color: var(--text); line-height: 1.5; padding: 0 12px;">
+        O chefe acabou de te atribuir uma OS nova.
+      </div>
+    </div>
+    <div class="modal-footer" style="padding: 16px 20px;">
+      <button class="btn-secondary" style="flex: 1;" onclick="Utils.closeModal('newOSAlertModal')">Depois</button>
+      <button class="btn-primary" id="newOSAlertVer" style="flex: 2;">👀 Ver Agora</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Câmera (tirar foto dentro do app) -->
+<div class="modal-overlay" id="cameraModal">
+  <div class="modal camera-modal">
+    <div class="modal-head">
+      <div class="modal-title">📷 Tirar Foto</div>
+      <button class="modal-close" onclick="Camera.close()">×</button>
+    </div>
+    <div class="modal-body" style="padding: 0; background: #000;">
+      <!-- ETAPA 1: Câmera ao vivo -->
+      <div id="cameraStep1">
+        <video id="cameraVideo" autoplay playsinline muted style="width: 100%; max-height: 60vh; background: #000; display: block;"></video>
+        <canvas id="cameraCanvas" style="display: none;"></canvas>
+      </div>
+      <!-- ETAPA 2: Preview da foto -->
+      <div id="cameraStep2" style="display: none;">
+        <img id="cameraPreview" style="width: 100%; max-height: 60vh; background: #000; display: block; object-fit: contain;">
+      </div>
+    </div>
+    <div class="modal-footer" id="cameraFooter1">
+      <button class="btn-secondary" style="flex: 1;" onclick="Camera.close()">Cancelar</button>
+      <button class="btn-primary" style="flex: 2;" onclick="Camera.capture()">📸 Tirar Foto</button>
+    </div>
+    <div class="modal-footer" id="cameraStep2Footer" style="display: none;">
+      <button class="btn-secondary" style="flex: 1;" onclick="Camera.retake()">🔄 Refazer</button>
+      <button class="btn-primary" style="flex: 2;" onclick="Camera.confirm()">✅ Usar Esta</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Notificações -->
+<div class="modal-overlay" id="notifModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">🔔 Notificações</div>
+      <button class="modal-close" onclick="Utils.closeModal('notifModal')">×</button>
+    </div>
+    <div class="modal-body" style="padding: 0;">
+      <div id="notifList"><div class="loading">Carregando...</div></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="Notifications.markAllRead()">✓ Marcar todas lidas</button>
+      <button class="btn-secondary" style="flex: 1;" onclick="Utils.closeModal('notifModal')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCRIPTS -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/utils/helpers.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/modules/dashboard.js"></script>
+<script src="js/modules/clientes.js"></script>
+<script src="js/modules/cortes.js"></script>
+<script src="js/modules/ordens.js"></script>
+<script src="js/modules/orcamentos.js"></script>
+<script src="js/modules/produtos.js"></script>
+<script src="js/modules/estoque.js"></script>
+<script src="js/modules/financeiro.js"></script>
+<script src="js/modules/funcionarios.js"></script>
+<script src="js/modules/agenda.js"></script>
+<script src="js/modules/configuracoes.js"></script>
+<script src="js/modules/notifications.js"></script>
+<script src="js/modules/camera.js"></script>
+<script src="js/modules/minhas-os.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>

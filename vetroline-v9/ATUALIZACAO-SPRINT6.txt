@@ -1,0 +1,70 @@
+═══════════════════════════════════════════════════════════════
+  VetroLine — ATUALIZAÇÃO Sprint 6
+═══════════════════════════════════════════════════════════════
+
+NOVIDADES:
+─────────
+✅ EDITAR funcionário (nome, telefone, cargo)
+✅ BLOQUEAR/DESBLOQUEAR funcionário (sem perder histórico)
+✅ DELETAR funcionário (com confirmação dupla)
+✅ Visual responsivo perfeito no celular (cards bonitos)
+✅ Não dá pra deletar/bloquear a si mesmo (proteção)
+
+
+═══════════════════════════════════════════════════════════════
+INSTALAÇÃO (1 PASSO!)
+═══════════════════════════════════════════════════════════════
+
+✅ NÃO PRECISA RODAR SQL!
+✅ NÃO PRECISA MEXER NO SUPABASE!
+
+
+PASSO ÚNICO — SUBIR ATUALIZAÇÃO NO GITHUB:
+1. Apaga pasta vetroline antiga
+2. Extrai vetroline-sprint6.zip
+3. Renomeia "vetroline-v6" pra "vetroline"
+4. Vai no GitHub → teu repositório
+5. "Add file" → "Upload files"
+6. Arrasta TODOS arquivos da pasta vetroline
+7. Confirma "Replace existing files"
+8. Commit changes
+9. Em 30 segundos tá no ar!
+
+
+COMO FUNCIONA:
+──────────────
+
+📋 LISTA DE FUNCIONÁRIOS:
+- No PC: tabela completa com botões na linha
+- No celular: cards bonitos com botões grandes
+
+✏️ EDITAR:
+- Clica no botão ✏️
+- Muda nome, telefone, cargo
+- Salva
+(Email e senha NÃO podem ser editados pela tela — só apagar e criar de novo)
+
+🚫 BLOQUEAR:
+- Clica em 🚫
+- Confirma
+- Funcionário não consegue mais entrar
+- Mas o histórico dele continua (OSs antigas, fotos)
+- Pra desbloquear, clica em ✅
+
+🗑️ DELETAR:
+- Clica em 🗑️
+- Confirma DUAS vezes (proteção contra acidente)
+- Apaga PERMANENTEMENTE
+
+
+PRÓXIMO SPRINT (Sprint 7):
+──────────────────────────
+🚀 Cadastro automático de NOVA VIDRAÇARIA
+🚀 Página inicial com preços (landing page)
+🚀 Trial de 14 dias
+🚀 Sistema multi-tenant 100% automatizado
+
+Aí qualquer vidraçaria entra no site, se cadastra, e pronto! 
+Tu não precisa criar nada manualmente.
+
+🔥 BORA TESTAR!
