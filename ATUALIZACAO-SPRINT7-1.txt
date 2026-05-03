@@ -1,0 +1,54 @@
+═══════════════════════════════════════════════════════════════
+  VetroLine — ATUALIZAÇÃO Sprint 7.1 (BUG FIX URGENTE!)
+═══════════════════════════════════════════════════════════════
+
+OPA ELIAB! Atualizei pra arrumar o bug do "Orçamento Rápido"!
+
+
+═══════════════════════════════════════════════════════════════
+O QUE FOI ARRUMADO:
+═══════════════════════════════════════════════════════════════
+
+✅ Botão "Fazer Orçamento Rápido" (dentro da OS) SEM valores
+✅ Agora pede: nome, telefone, endereço, serviço, medidas, observações
+✅ Permite tirar FOTO direto
+✅ Manda pro chefe com status "Pendente"
+
+
+═══════════════════════════════════════════════════════════════
+PASSO PRA SUBIR:
+═══════════════════════════════════════════════════════════════
+
+1. Apaga a pasta vetroline antiga
+2. Extrai o vetroline-sprint7-1.zip
+3. Renomeia "vetroline-v7" pra "vetroline"
+4. Vai no GitHub → repositório vetro-line
+5. Add file → Upload files
+6. Arrasta TUDO de dentro da pasta
+7. Confirma "Replace existing files"
+8. Commit changes
+9. Espera 30 segundos
+
+
+═══════════════════════════════════════════════════════════════
+DEPOIS:
+═══════════════════════════════════════════════════════════════
+
+📱 NO CELULAR: Limpa o cache!
+- Chrome → 3 pontinhos → Histórico → Limpar dados → Limpar
+
+
+═══════════════════════════════════════════════════════════════
+TESTE:
+═══════════════════════════════════════════════════════════════
+
+1. Loga como funcionário
+2. Vai em Minhas OS → abre uma OS
+3. Rola até embaixo: "Fazer Orçamento Rápido"
+4. AGORA vai abrir um formulário SEM valores 🎉
+5. Preenche nome, telefone, endereço, serviço, medidas, observações
+6. Tira uma foto
+7. Enviar pro Chefe
+8. PRONTO!
+
+🔥 BORA TESTAR!

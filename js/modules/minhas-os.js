@@ -283,53 +283,135 @@ const MinhasOS = {
     await Cortes.loadForOS(this.currentOS.id);
   },
 
+  qqPhotos: [],
+
   openQuickQuote() {
     Utils.closeModal('osDetailModal');
     Utils.clearForm('quickQuoteForm');
-    document.getElementById('qq_client_name').textContent = this.currentOS.clients?.name || '—';
+    
+    // Pré-preenche com dados do cliente da OS
+    const client = this.currentOS.clients;
+    if (client) {
+      document.getElementById('qq_client_name_input').value = client.name || '';
+      document.getElementById('qq_client_phone').value = client.phone || '';
+      document.getElementById('qq_client_address').value = client.address || '';
+    }
+    
+    // Limpa fotos
+    this.qqPhotos = [];
+    document.getElementById('qq_photos').innerHTML = '';
+    
     Utils.openModal('quickQuoteModal');
   },
 
-  calculateQuickQuoteTotal() {
-    const items = parseFloat(document.getElementById('qq_items').value) || 0;
-    const labor = parseFloat(document.getElementById('qq_labor').value) || 0;
-    const discount = parseFloat(document.getElementById('qq_discount').value) || 0;
-    const total = items + labor - discount;
-    document.getElementById('qq_total').textContent = Utils.money(total);
-    return total;
+  async uploadQQPhoto(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    Utils.toast('Enviando foto...', 'info');
+
+    try {
+      const ext = file.name.split('.').pop();
+      const fileName = `quotes/${Date.now()}.${ext}`;
+
+      // Tenta no quote-photos primeiro
+      const { error: uploadError } = await sb.storage
+        .from('quote-photos')
+        .upload(fileName, file);
+      
+      if (uploadError) {
+        // Fallback: os-photos
+        const { error: fallbackError } = await sb.storage
+          .from('os-photos')
+          .upload(fileName, file);
+        if (fallbackError) throw fallbackError;
+        const { data: urlData } = sb.storage.from('os-photos').getPublicUrl(fileName);
+        this.qqPhotos.push(urlData.publicUrl);
+      } else {
+        const { data: urlData } = sb.storage.from('quote-photos').getPublicUrl(fileName);
+        this.qqPhotos.push(urlData.publicUrl);
+      }
+
+      this.renderQQPhotos();
+      Utils.toast('✅ Foto adicionada!');
+    } catch (err) {
+      Utils.toast('Erro: ' + err.message, 'error');
+    }
+  },
+
+  renderQQPhotos() {
+    const container = document.getElementById('qq_photos');
+    if (!container) return;
+    container.innerHTML = this.qqPhotos.map((url, idx) => `
+      <div class="photo-thumb">
+        <img src="${url}" alt="Foto ${idx+1}" onclick="window.open('${url}', '_blank')">
+        <button class="photo-delete" onclick="MinhasOS.removeQQPhoto(${idx})">×</button>
+      </div>
+    `).join('');
+  },
+
+  removeQQPhoto(idx) {
+    this.qqPhotos.splice(idx, 1);
+    this.renderQQPhotos();
   },
 
   async saveQuickQuote() {
-    const total = this.calculateQuickQuoteTotal();
-    
-    const payload = {
-      organization_id: APP_STATE.organization.id,
-      quote_number: Utils.generateQuoteNumber(),
-      client_id: this.currentOS.client_id,
-      subtotal: parseFloat(document.getElementById('qq_items').value) || 0,
-      labor_cost: parseFloat(document.getElementById('qq_labor').value) || 0,
-      discount: parseFloat(document.getElementById('qq_discount').value) || 0,
-      total: total,
-      status: 'draft',
-      notes: 'Orçamento criado em campo por ' + APP_STATE.profile.name + '\n' + (document.getElementById('qq_notes').value || '')
-    };
+    const clientName = document.getElementById('qq_client_name_input').value.trim();
+    const clientPhone = document.getElementById('qq_client_phone').value.trim();
+    const clientAddress = document.getElementById('qq_client_address').value.trim();
+    const serviceType = document.getElementById('qq_service_type').value.trim();
+    const measurements = document.getElementById('qq_measurements').value.trim();
+    const notes = document.getElementById('qq_notes').value.trim();
 
-    const { data: quote, error } = await sb.from('quotes').insert(payload).select().single();
-    if (error) { Utils.toast('Erro: ' + error.message, 'error'); return; }
+    if (!clientName) { Utils.toast('Nome do cliente é obrigatório', 'error'); return; }
+    if (!serviceType) { Utils.toast('Tipo de serviço é obrigatório', 'error'); return; }
 
-    // NOTIFICAÇÃO PRO CHEFE
-    await Notifications.create({
-      recipientRole: 'admin',
-      type: 'quote_created',
-      title: `💰 Novo orçamento de ${APP_STATE.profile.name}`,
-      message: `${this.currentOS.clients?.name || 'Cliente'} - ${Utils.money(total)}`,
-      relatedId: quote.id,
-      relatedType: 'quote'
-    });
+    const btn = document.getElementById('qqSaveBtn');
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
 
-    Utils.toast('💰 Orçamento criado! Chefe vai revisar.');
-    Utils.closeModal('quickQuoteModal');
-    this.openDetail(this.currentOS.id);
+    try {
+      const payload = {
+        organization_id: APP_STATE.organization.id,
+        quote_number: Utils.generateQuoteNumber(),
+        client_id: this.currentOS.client_id || null,
+        client_name_temp: clientName,
+        client_phone_temp: clientPhone,
+        client_address_temp: clientAddress,
+        service_type: serviceType,
+        measurements: measurements,
+        notes: notes,
+        photos: this.qqPhotos,
+        status: 'pending_review',
+        created_by_role: 'worker',
+        subtotal: 0,
+        labor_cost: 0,
+        discount: 0,
+        total: 0
+      };
+
+      const { data: quote, error } = await sb.from('quotes').insert(payload).select().single();
+      if (error) throw error;
+
+      // NOTIFICAÇÃO PRO CHEFE
+      await Notifications.create({
+        recipientRole: 'admin',
+        type: 'quote_created',
+        title: `💰 Novo orçamento de ${APP_STATE.profile.name}`,
+        message: `${clientName} - ${serviceType}`,
+        relatedId: quote.id,
+        relatedType: 'quote'
+      });
+
+      Utils.toast('✅ Orçamento enviado pro chefe!');
+      Utils.closeModal('quickQuoteModal');
+      this.openDetail(this.currentOS.id);
+    } catch (err) {
+      Utils.toast('Erro: ' + err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '💾 Enviar pro Chefe';
+    }
   }
 
 };
