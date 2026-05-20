@@ -363,6 +363,7 @@ const Orcamentos = {
     
     // Mostrar dados temporários do cliente (se foi funcionário que criou)
     const tempInfoEl = document.getElementById('orcTempClientInfo');
+    const temClienteTemp = isWorkerCreated && data.client_name_temp && !data.client_id;
     if (isWorkerCreated && (data.client_name_temp || data.service_type)) {
       tempInfoEl.style.display = 'block';
       tempInfoEl.innerHTML = `
@@ -381,6 +382,16 @@ const Orcamentos = {
               </div>
             </div>
           ` : ''}
+          ${temClienteTemp ? `
+            <button class="btn-primary" style="margin-top: 14px; width: 100%;" onclick="Orcamentos.registerTempClient('${data.id}')">
+              👤➕ Cadastrar Cliente Novo
+            </button>
+          ` : ''}
+          ${data.client_id ? `
+            <div style="margin-top: 12px; padding: 8px 12px; background: #06d6a020; border-radius: 6px; color: var(--secondary); font-size: 0.85rem;">
+              ✅ Cliente já cadastrado no sistema
+            </div>
+          ` : ''}
         </div>
       `;
     } else {
@@ -388,8 +399,6 @@ const Orcamentos = {
     }
 
     document.getElementById('orc_number').value = data.quote_number || '';
-    document.getElementById('orc_client').value = data.client_id || '';
-    document.getElementById('orc_subtotal').value = data.subtotal || '';
     document.getElementById('orc_labor').value = data.labor_cost || '';
     document.getElementById('orc_discount').value = data.discount || '';
     document.getElementById('orc_total').value = data.total || '';
@@ -402,28 +411,70 @@ const Orcamentos = {
   },
 
   calculateTotal() {
-    const subtotal = parseFloat(document.getElementById('orc_subtotal').value) || 0;
     const labor = parseFloat(document.getElementById('orc_labor').value) || 0;
     const discount = parseFloat(document.getElementById('orc_discount').value) || 0;
-    const total = subtotal + labor - discount;
+    const total = labor - discount;
     document.getElementById('orc_total').value = total.toFixed(2);
   },
 
+  // Cadastra o cliente temporário do funcionário como cliente real
+  async registerTempClient(quoteId) {
+    const { data: quote, error } = await sb.from('quotes').select('*').eq('id', quoteId).single();
+    if (error || !quote) { Utils.toast('Erro ao carregar orçamento', 'error'); return; }
+
+    if (!quote.client_name_temp) {
+      Utils.toast('Esse orçamento não tem cliente novo pra cadastrar', 'error');
+      return;
+    }
+
+    if (quote.client_id) {
+      Utils.toast('Esse orçamento já tem cliente cadastrado', 'info');
+      return;
+    }
+
+    if (!await Utils.confirm(`Cadastrar "${quote.client_name_temp}" como cliente?`, {
+      title: 'Cadastrar Cliente',
+      icon: '👤',
+      okText: '✅ Sim, cadastrar'
+    })) return;
+
+    // Cria cliente
+    const { data: client, error: clientError } = await sb.from('clients').insert({
+      organization_id: APP_STATE.organization.id,
+      name: quote.client_name_temp,
+      phone: quote.client_phone_temp,
+      address: quote.client_address_temp
+    }).select().single();
+
+    if (clientError) { Utils.toast('Erro ao cadastrar cliente: ' + clientError.message, 'error'); return; }
+
+    // Linka o orçamento ao cliente novo
+    await sb.from('quotes').update({
+      client_id: client.id
+    }).eq('id', quoteId);
+
+    Utils.toast(`✅ ${client.name} cadastrado!`, 'success');
+
+    // Recarrega o modal pra mostrar o estado novo
+    await this.openDetail(quoteId);
+  },
+
   async save() {
+    const status = document.getElementById('orc_status').value;
+
     const payload = {
       organization_id: APP_STATE.organization.id,
       quote_number: document.getElementById('orc_number').value.trim(),
-      client_id: document.getElementById('orc_client').value || null,
-      subtotal: parseFloat(document.getElementById('orc_subtotal').value) || 0,
       labor_cost: parseFloat(document.getElementById('orc_labor').value) || 0,
       discount: parseFloat(document.getElementById('orc_discount').value) || 0,
       total: parseFloat(document.getElementById('orc_total').value) || 0,
       valid_until: document.getElementById('orc_valid_until').value || null,
       payment_method: document.getElementById('orc_payment').value,
-      status: document.getElementById('orc_status').value,
+      status: status,
       notes: document.getElementById('orc_notes').value.trim()
     };
 
+    // Salva o orçamento primeiro
     let result;
     if (this.editingId) {
       result = await sb.from('quotes').update(payload).eq('id', this.editingId);
@@ -433,7 +484,38 @@ const Orcamentos = {
 
     if (result.error) { Utils.toast('Erro: ' + result.error.message, 'error'); return; }
 
-    Utils.toast(this.editingId ? 'Orçamento atualizado!' : 'Orçamento criado!');
+    // Se APROVADO + tem cliente temp e ainda não cadastrou → cadastra automaticamente
+    if (status === 'accepted' && this.editingId && this.currentQuote) {
+      const quote = this.currentQuote;
+      if (quote.client_name_temp && !quote.client_id) {
+        const { data: client, error: clientError } = await sb.from('clients').insert({
+          organization_id: APP_STATE.organization.id,
+          name: quote.client_name_temp,
+          phone: quote.client_phone_temp,
+          address: quote.client_address_temp
+        }).select().single();
+
+        if (clientError) {
+          Utils.toast('Orçamento salvo, mas erro ao cadastrar cliente: ' + clientError.message, 'error');
+        } else {
+          await sb.from('quotes').update({ client_id: client.id }).eq('id', this.editingId);
+          Utils.toast(`✅ Aprovado! ${client.name} cadastrado como cliente.`, 'success');
+          Utils.closeModal('orcModal');
+          await this.list();
+          return;
+        }
+      }
+    }
+
+    // Mensagens conforme status
+    const msgs = {
+      'pending_review': '⏳ Salvo como pendente',
+      'accepted': '✅ Orçamento aprovado!',
+      'rejected': '❌ Orçamento rejeitado',
+      'draft': 'Rascunho salvo',
+      'sent': 'Orçamento enviado'
+    };
+    Utils.toast(msgs[status] || 'Orçamento salvo!');
     Utils.closeModal('orcModal');
     await this.list();
   },
