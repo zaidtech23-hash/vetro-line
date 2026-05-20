@@ -72,6 +72,9 @@
       <div class="sidebar-item" data-screen="historico" onclick="App.showScreen('historico')">
         <span class="sidebar-icon">📚</span> Histórico
       </div>
+      <div class="sidebar-item" data-screen="planos-corte" onclick="App.showScreen('planos-corte')">
+        <span class="sidebar-icon">✂️</span> Planos de Corte
+      </div>
 
       <div class="sidebar-section">Operação</div>
       <div class="sidebar-item" data-screen="ordens" onclick="App.showScreen('ordens')">
@@ -186,6 +189,23 @@
     </div>
     
     <div class="os-mobile-list" id="historicoList"><div class="loading">Carregando...</div></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       PLANOS DE CORTE
+       ═══════════════════════════════════════════════════════════ -->
+  <div id="screen-planos-corte" class="screen">
+    <div class="screen-title"><h2>✂️ Planos de Corte</h2><p>LISTA DE CORTES PRA IMPRIMIR</p></div>
+
+    <!-- Filtro só pra admin -->
+    <div id="planosFilters" style="margin-bottom: 16px;">
+      <label class="form-label">Filtrar por funcionário:</label>
+      <select class="form-select" id="planosWorkerFilter" onchange="PlanosCorte.filterByWorker(this.value)">
+        <option value="">— Todos os funcionários —</option>
+      </select>
+    </div>
+
+    <div class="os-mobile-list" id="planosList"><div class="loading">Carregando...</div></div>
   </div>
 
   <!-- ORDENS -->
@@ -885,6 +905,21 @@
   </div>
 </div>
 
+<!-- Modal Plano de Corte (impressão) -->
+<div class="modal-overlay" id="planoCorteModal">
+  <div class="modal large">
+    <div class="modal-head no-print">
+      <div class="modal-title">📄 Plano de Corte</div>
+      <button class="modal-close" onclick="Utils.closeModal('planoCorteModal')">×</button>
+    </div>
+    <div class="modal-body" id="planoCorteContent"></div>
+    <div class="modal-footer no-print">
+      <button class="btn-secondary" style="flex: 1;" onclick="Utils.closeModal('planoCorteModal')">Fechar</button>
+      <button class="btn-primary" style="flex: 2;" onclick="PlanosCorte.imprimir()">🖨️ Imprimir / Salvar PDF</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal Notificações -->
 <div class="modal-overlay" id="notifModal">
   <div class="modal">
@@ -922,6 +957,7 @@
 <script src="js/modules/camera.js"></script>
 <script src="js/modules/minhas-os.js"></script>
 <script src="js/modules/historico.js"></script>
+<script src="js/modules/planos-corte.js"></script>
 <script src="js/app.js"></script>
 
 </body>
