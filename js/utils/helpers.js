@@ -102,6 +102,7 @@ const Utils = {
         transition: all 0.3s ease;
         opacity: 0;
         transform: translateY(20px);
+        pointer-events: none;
       `;
       document.body.appendChild(toast);
     }
