@@ -2015,6 +2015,28 @@ body {
 /* Modal de confirmação customizado */
 .confirm-modal {
   border-top: 4px solid var(--warning);
+  max-width: 480px;
+  width: 100%;
+}
+
+/* O confirm modal SEMPRE fica em cima de qualquer outra modal aberta,
+   e seu fundo escuro precisa cobrir totalmente a modal de baixo */
+#customConfirmModal {
+  z-index: 3500;
+  background: rgba(0, 0, 0, 0.92);
+}
+
+#customConfirmModal .modal {
+  overflow-x: hidden;
+}
+
+#customConfirmModal .modal-footer {
+  overflow: hidden;
+}
+
+#customConfirmModal .modal-footer button {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .confirm-icon {
