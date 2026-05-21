@@ -200,6 +200,25 @@ window.addEventListener('DOMContentLoaded', () => {
   const pwd = document.getElementById('password');
   if (pwd) pwd.addEventListener('keypress', (e) => { if (e.key === 'Enter') App.login(); });
 
+  // Quando o app volta a ficar visível (depois de minimizar, destravar celular, trocar de aba),
+  // renova a sessão pra não dar problema na próxima ação.
+  document.addEventListener('visibilitychange', async () => {
+    if (document.visibilityState === 'visible' && APP_STATE.user) {
+      const ok = await Auth.ensureSession();
+      if (!ok) {
+        console.warn('Sessão expirou, recarregando...');
+        location.reload();
+      }
+    }
+  });
+
+  // Renova periodicamente (a cada 4 minutos) pra evitar expiração silenciosa
+  setInterval(async () => {
+    if (APP_STATE.user) {
+      await Auth.ensureSession();
+    }
+  }, 4 * 60 * 1000);
+
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       // Se o confirm modal estiver aberto, simula clicar em Cancelar

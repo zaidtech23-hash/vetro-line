@@ -28,6 +28,39 @@ const Auth = {
     return data?.user || null;
   },
 
+  // GARANTE QUE A SESSÃO TÁ VÁLIDA (renova se precisar)
+  // Chama isso antes de operações importantes
+  async ensureSession() {
+    try {
+      const { data: sessionData } = await sb.auth.getSession();
+      const session = sessionData?.session;
+
+      if (!session) {
+        console.warn('Sem sessão — tentando renovar...');
+        const { data: refreshed, error } = await sb.auth.refreshSession();
+        if (error || !refreshed?.session) {
+          console.error('Falha ao renovar sessão:', error);
+          return false;
+        }
+        return true;
+      }
+
+      // Se a sessão expira em menos de 60s, renova já
+      const expiresIn = (session.expires_at * 1000) - Date.now();
+      if (expiresIn < 60_000) {
+        const { data: refreshed, error } = await sb.auth.refreshSession();
+        if (error || !refreshed?.session) {
+          console.warn('Renovação automática falhou:', error);
+          return false;
+        }
+      }
+      return true;
+    } catch (err) {
+      console.error('Erro em ensureSession:', err);
+      return false;
+    }
+  },
+
   // CARREGA PERFIL COMPLETO (profile + organization)
   async loadProfile(userId) {
     const { data, error } = await sb

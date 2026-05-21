@@ -11,7 +11,14 @@ const SUPABASE_CONFIG = {
 };
 
 // Inicializa o cliente Supabase (variável global usada por todos os módulos)
-const sb = supabase.createClient(SUPABASE_CONFIG.URL, SUPABASE_CONFIG.KEY);
+const sb = supabase.createClient(SUPABASE_CONFIG.URL, SUPABASE_CONFIG.KEY, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+    storage: window.localStorage
+  }
+});
 
 // Estado global da aplicação
 const APP_STATE = {

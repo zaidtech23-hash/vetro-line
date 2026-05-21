@@ -307,6 +307,9 @@ const MinhasOS = {
     if (!this.currentOS) return;
 
     try {
+      // Garante que a sessão tá válida antes de salvar (renova se preciso)
+      await Auth.ensureSession();
+
       // 1) Atualiza status na OS
       const { error } = await sb
         .from('service_orders')
