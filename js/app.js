@@ -202,7 +202,17 @@ window.addEventListener('DOMContentLoaded', () => {
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
+      // Se o confirm modal estiver aberto, simula clicar em Cancelar
+      const confirmModal = document.getElementById('customConfirmModal');
+      if (confirmModal && confirmModal.classList.contains('active')) {
+        const cancelBtn = document.getElementById('confirmCancelBtn');
+        if (cancelBtn && cancelBtn.onclick) {
+          cancelBtn.onclick();
+          return;
+        }
+      }
       document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+      document.body.classList.remove('has-confirm-open');
       App.closeSidebar();
     }
   });

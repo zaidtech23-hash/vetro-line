@@ -306,10 +306,8 @@ const MinhasOS = {
   async updateStatus(newStatus, withFeedback = false) {
     if (!this.currentOS) return;
 
-    const btn = event?.target;
-    if (btn) { btn.disabled = true; btn.textContent = 'Salvando...'; }
-
     try {
+      // 1) Atualiza status na OS
       const { error } = await sb
         .from('service_orders')
         .update({ status: newStatus })
@@ -321,33 +319,51 @@ const MinhasOS = {
         return;
       }
 
-      Utils.toast(`✅ ${Utils.statusLabel(newStatus)}`);
-      
-      // NOTIFICAÇÃO PRO CHEFE (só em momentos IMPORTANTES: Em campo + Concluído)
-      // Em produção é só interno, não notifica chefe
-      try {
-        if (newStatus === 'done') {
-          await Notifications.create({
-            recipientRole: 'admin',
-            type: 'os_completed',
-            title: `🎉 OS ${this.currentOS.os_number} CONCLUÍDA!`,
-            message: `${APP_STATE.profile.name} terminou: ${this.currentOS.title}`,
-            relatedId: this.currentOS.id,
-            relatedType: 'service_order'
-          });
-        } else if (newStatus === 'in_field') {
-          await Notifications.create({
-            recipientRole: 'admin',
-            type: 'os_started',
-            title: `🚚 ${APP_STATE.profile.name} saiu pra obra!`,
-            message: `OS ${this.currentOS.os_number}: ${this.currentOS.title}`,
-            relatedId: this.currentOS.id,
-            relatedType: 'service_order'
-          });
+      // 2) NOTIFICAÇÃO PRO CHEFE (Em campo + Concluído)
+      // Tenta até 3x se falhar (pra resolver problemas de rede intermitentes)
+      const notifConfig = {
+        'done': {
+          type: 'os_completed',
+          title: `🎉 OS ${this.currentOS.os_number || ''} CONCLUÍDA!`,
+          message: `${APP_STATE.profile.name} terminou: ${this.currentOS.title}`
+        },
+        'in_field': {
+          type: 'os_started',
+          title: `🚚 ${APP_STATE.profile.name} saiu pra obra!`,
+          message: `OS ${this.currentOS.os_number || ''}: ${this.currentOS.title}`
         }
-        // in_production NÃO manda notif (só interno)
-      } catch (notifErr) {
-        console.warn('Notificação não foi criada:', notifErr);
+      };
+
+      if (notifConfig[newStatus]) {
+        let notifOk = false;
+        const cfg = notifConfig[newStatus];
+
+        for (let tentativa = 1; tentativa <= 3 && !notifOk; tentativa++) {
+          try {
+            notifOk = await Notifications.create({
+              recipientRole: 'admin',
+              type: cfg.type,
+              title: cfg.title,
+              message: cfg.message,
+              relatedId: this.currentOS.id,
+              relatedType: 'service_order'
+            });
+          } catch (err) {
+            console.warn(`Tentativa ${tentativa} de notificar falhou:`, err);
+          }
+          if (!notifOk && tentativa < 3) {
+            await new Promise(r => setTimeout(r, 500));
+          }
+        }
+
+        if (notifOk) {
+          Utils.toast(`✅ ${Utils.statusLabel(newStatus)} — Chefe avisado!`, 'success');
+        } else {
+          Utils.toast(`⚠️ ${Utils.statusLabel(newStatus)} salvo, mas falhou ao avisar o chefe. Tenta de novo!`, 'error');
+        }
+      } else {
+        // in_production / outros: só mostra status atualizado, sem mandar notif
+        Utils.toast(`✅ ${Utils.statusLabel(newStatus)}`);
       }
 
       this.currentOS.status = newStatus;
