@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VetroLine — Sistema de Gestão</title>
-<link rel="stylesheet" href="css/style.css?v=12">
+<link rel="stylesheet" href="css/style.css?v=13">
 </head>
 <body>
 
@@ -553,9 +553,10 @@
 
 <!-- Modal OS (admin) -->
 <div class="modal-overlay" id="osModal">
-  <div class="modal">
+  <div class="modal large">
     <div class="modal-head"><div class="modal-title" id="osModalTitle">Nova OS</div><button class="modal-close" onclick="Utils.closeModal('osModal')">×</button></div>
     <div class="modal-body" id="osForm">
+      <div id="osDetailPanel" style="display: none;"></div>
       <div class="form-row">
         <div><label class="form-label">Número OS</label><input class="form-input" id="os_number"></div>
         <div><label class="form-label">Vencimento</label><input class="form-input" id="os_due_date" type="date"></div>

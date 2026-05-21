@@ -2051,6 +2051,83 @@ body.has-confirm-open .modal-overlay:not(#customConfirmModal) {
   display: none !important;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   PAINEL DE DETALHES DA OS (admin)
+   ═══════════════════════════════════════════════════════════════ */
+.os-detail-banner {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 4px;
+}
+
+.os-detail-section {
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--border);
+}
+
+.os-detail-section:last-child {
+  border-bottom: none;
+}
+
+.os-detail-title {
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+
+.os-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.os-detail-cuts {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.os-detail-cut {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--bg-dark);
+  border-radius: 6px;
+  font-size: 0.88rem;
+  flex-wrap: wrap;
+}
+
+.os-detail-cut.cut-done {
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+
+.os-detail-cut .cut-indicator {
+  font-size: 1rem;
+}
+
+.os-detail-cut .cut-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.os-detail-cut .cut-obs {
+  flex-basis: 100%;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  font-style: italic;
+  margin-top: 2px;
+}
+
+
 .confirm-icon {
   font-size: 4rem;
   text-align: center;
