@@ -177,16 +177,18 @@ const Utils = {
         okBtn.style.background = '';
       }
       
-      // Mostra modal
+      // Mostra modal + marca body pra esconder modais de baixo
       modal.classList.add('active');
-      
+      document.body.classList.add('has-confirm-open');
+
       // Handler dos botões (substitui sempre pra evitar múltiplos listeners)
       const cleanup = () => {
         modal.classList.remove('active');
+        document.body.classList.remove('has-confirm-open');
         okBtn.onclick = null;
         document.getElementById('confirmCancelBtn').onclick = null;
       };
-      
+
       okBtn.onclick = () => { cleanup(); resolve(true); };
       document.getElementById('confirmCancelBtn').onclick = () => { cleanup(); resolve(false); };
     });

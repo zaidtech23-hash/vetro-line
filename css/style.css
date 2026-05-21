@@ -2020,23 +2020,35 @@ body {
 }
 
 /* O confirm modal SEMPRE fica em cima de qualquer outra modal aberta,
-   e seu fundo escuro precisa cobrir totalmente a modal de baixo */
+   e seu fundo precisa SER TOTALMENTE OPACO pra esconder o que está atrás */
 #customConfirmModal {
-  z-index: 3500;
-  background: rgba(0, 0, 0, 0.92);
+  z-index: 3500 !important;
+  background: #060910 !important;
 }
 
 #customConfirmModal .modal {
-  overflow-x: hidden;
+  overflow-x: hidden !important;
+  max-width: 480px !important;
 }
 
 #customConfirmModal .modal-footer {
   overflow: hidden;
+  flex-wrap: nowrap;
 }
 
 #customConfirmModal .modal-footer button {
-  min-width: 0;
-  max-width: 100%;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  flex: 1 1 0 !important;
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Quando o confirm modal estiver aberto, esconde fisicamente
+   qualquer outra modal-overlay (não fica nada por baixo) */
+body.has-confirm-open .modal-overlay:not(#customConfirmModal) {
+  display: none !important;
 }
 
 .confirm-icon {
